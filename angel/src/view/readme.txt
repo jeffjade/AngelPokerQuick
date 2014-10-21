@@ -1,0 +1,1 @@
+-- 此文件夹建议用来存放ui的layout(即 CocosStudio生成的文件);
