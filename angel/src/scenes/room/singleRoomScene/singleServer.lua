@@ -18,7 +18,7 @@ function SingleServer:dtor()
 end
 
 function SingleServer:init()
-	self.mRoomInfo =  
+	self.mRoomInfo =  require(GameRoomPath.."roomCache").new()
 end
 
 function SingleServer:addMachine()
@@ -107,8 +107,40 @@ function SingleServer:playStart()
 	local firstPlayPlayerMid = self:findStandsOutMid()
 	local firstPlayer = self:findPlayerByMid(firstPlayPlayerMid)
 
+	for k,v pairs(self.mRoomInfo.mPlayerSeatMap) do 
+		if v:getMid() ~= firstPlayPlayerMid then
+			v:setTeam(2)
+		else
+			v:setTeam(1)
+		end
+		v:setReady(false);
+	end
+	self.mRoomInfo:setCurrentPlayer(firstPlayPlayerMid)
+	self.mRoomInfo:setNextPlayer(0);
+	
+	-- StateMachine:getInstance():pushCommand(firstPlayer.thinkHowGame, firstPlayer);
+	-- firstPlayer:thinkHowGame()
+	self:dispatchEvent({name = "SERVER_EVENT.PLAY_START"})
 end
 
+function SingleServer:onPlayStartEvent()
+	-- EventDispatcher.getInstance():dispatch(SERVER_EVENT.PLAY_NEW_TURN);
+	-- 发消息告诉现在进入新的一轮;
+	self:dispatchEvent({name = "SERVER_EVENT.PLAY_NEW_TURN"})
+
+	self.mHadPlay = true
+	-- local g_info = self.m_state:getInfo()
+	-- local mid = g_info:getLandlord();
+	-- local player = g_info:findPlayerByMid(mid);
+	-- g_info:setCurrentPlayer(mid);
+	-- self:getNextPlayer();
+	-- StateMachine:getInstance():pushCommand(player.think, player);
+
+	local firstPlayPlayerMid = self:findStandsOutMid()
+	self:setCurrentPlayer(firstPlayPlayerMid)
+	local firstPlayer = self:findPlayerByMid(firstPlayPlayerMid)
+	firstPlayer:thinkHowGame()
+end
 
 --=========================================Helper Fun===================================================
 -- 遍历每个玩家的牌,找到红桃3所属玩家的mid

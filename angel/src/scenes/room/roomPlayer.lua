@@ -50,6 +50,7 @@ function RoomPlayer:getSeat()
 	return self.mSeat or 1
 end
 
+
 function RoomPlayer:setIsReady(ready)
 	self.mReady = ready and true or false
 end
@@ -58,3 +59,11 @@ function RoomPlayer:getIsReady()
 	return slef.mReady
 end
 
+
+function RoomPlayer:setOutCards(_num, _types, _cards)
+	self.mOutCards = { count = _num; types = _types, cards = _cards };
+end
+
+function RoomPlayer:getOutCards()
+	return self.mOutCards or {}
+end
