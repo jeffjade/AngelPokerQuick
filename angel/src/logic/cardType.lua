@@ -50,6 +50,11 @@ end
 
 CardUtil = {};
 
+CardUtil.getCardsValue = function()
+	local cardsValue = {3,4,5,6,7,8,9,10,11,12,13,14,15}
+	return cardsValue
+end
+
 CardUtil.getAllCards = function()
 	local cards = {}
 	for i = 0, 3 do
@@ -169,8 +174,13 @@ CardUtil.getCardInfo = function(cardByte)
 	return cardInfo;
 end
 
-local allCards = CardUtil.getAllCardsWithNoKings()
-local playerCards , otherCards = CardUtil.get13cards(allCards)
-print_lua_table(playerCards)
-print("===================")
-print_lua_table(otherCards)
+-- local allCards = CardUtil.getAllCardsWithNoKings()
+-- local playerCards , otherCards = CardUtil.get13cards(allCards)
+-- print_lua_table(playerCards)
+-- print("===================")
+-- print_lua_table(otherCards)
+
+local tab = {{}, {}, {}, {}}
+table.insert(tab[1], 22)
+
+print_lua_table(tab)
