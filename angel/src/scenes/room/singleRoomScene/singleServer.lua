@@ -30,7 +30,7 @@ function SingleServer:addMachine()
 		singleRobotData[k] = v;
 	end
 
-	for i = 1, maxPlayerNum-1 , do 
+	for i = 1, maxPlayerNum-1  do 
 		local mid = self.mAiCount or 100
 		mid = mid + 1
 		self.mAiCount = mid
@@ -107,7 +107,7 @@ function SingleServer:playStart()
 	local firstPlayPlayerMid = self:findStandsOutMid()
 	local firstPlayer = self:findPlayerByMid(firstPlayPlayerMid)
 
-	for k,v pairs(self.mRoomInfo.mPlayerSeatMap) do 
+	for k,v in pairs(self.mRoomInfo.mPlayerSeatMap) do 
 		if v:getMid() ~= firstPlayPlayerMid then
 			v:setTeam(2)
 		else

@@ -49,7 +49,7 @@ end
 function GameAiPlayer:outFirstCard()
 	local outCards , betCards
 	-- first out card: random from true(1) and false(0)
-	local betCardsFlag = ToolUtil.randomInt(1 , 0)
+	local betCardsFlag = ToolUtil.ToolUtil.randomInt(1 , 0)
 	if betCardsFlag == 1 then 
 		outCards , betCards = self:outBetTrueCard()
 	elseif betCardsFlag == 0 then 
@@ -66,18 +66,28 @@ end
 -- 出真牌(即out bet牌一致)
 function GameAiPlayer:outBetTrueCard(Cards)
 	-- random from(1~4) to get the number true cards
-	local cardsNum = ToolUtil.random(4,1)
-	local trueCardsList = self:findTrueCardList(Cards)
+	local trueCardsList = findTrueCardList(Cards)
+
+	-- 得到有效的真牌表(剔除空table)
+	for k , v in pairs(trueCardsList) do 
+		if v and type(v) and not next(v) then
+			table.remove(trueCardsList, k )
+		end
+	end
+
+	-- 从有效表中随机一组出来
+	local cardsNum = ToolUtil.randomInt(#trueCardsList , 1)
 	local tempCards = trueCardsList[cardsNum]
 
 	-- random from(1~num);得到真牌组内出哪张真牌
-	local num = ToolUtil.random(#tempCards or 1, 1)
+	local num = ToolUtil.randomInt(#tempCards or 1, 1)
 	local trueCards = tempCards[num]
 
 	local betCards ={}
 	betCards.num = 	cardsNum
 	betCards.value = trueCards.cardValue;
 
+	print_lua_table(trueCards)
 	return trueCards , betCards
 end
 
@@ -100,7 +110,7 @@ function GameAiPlayer:findTrueCardList(Cards)
 	-- 即得到一张真牌表(里面有4个子表~分别存放n=1,2,3,4张真牌的表)
 	local tempList = {0,1,2,3,4}
 	local trueCardsList = {{} , {}, {}, {}}
-	for k,v in ipairs(tempList) do 
+	for k,v in ipairs(cardsList) do 
 		if     v and #v == tempList[1] then
 			-- do noting 
 		elseif v and #v == tempList[2] then 
@@ -133,6 +143,3 @@ end
 function GameAiPlayer:turnCard()
 	
 end
-
-
-

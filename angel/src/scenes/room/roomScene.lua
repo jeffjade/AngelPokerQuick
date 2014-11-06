@@ -1,6 +1,6 @@
 -- File : roomScene.lua
 -- Date : 2014.10.21:22:23
--- Auth : JeffYang 
+-- Auth : JeffYang
 
 local RoomScene = class("RoomScene", function()
     return display.newScene("RoomScene")

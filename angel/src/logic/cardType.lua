@@ -125,6 +125,7 @@ CardUtil.get13cards = function(cards)
 	for i = 1, 13 do
 		math.randomseed(tostring(os.time()):reverse():sub(1, 6))
 		index = math.random(#cards);
+		print("*****"..index)
 		list[i] = cards[index];
 		table.remove(cards, index);
 	end
@@ -154,6 +155,16 @@ CardUtil.generateCards = function()
 	return rtn;
 end
 
+-- 洗牌[2014.11.06~~21:38]
+CardUtil.shuffleCards = function(cards)
+	math.randomseed(tostring(os.time()):reverse():sub(1, 6))
+	local cardsCount = #cards
+	for i = 1, cardsCount do
+		index = math.random(cardsCount);
+		cards[index],cards[i] = cards[i],cards[index] 
+	end
+	return cards
+end
 
 CardUtil.getCardInfo = function(cardByte)
 	local cardTypeValue = cardByte;
@@ -174,13 +185,82 @@ CardUtil.getCardInfo = function(cardByte)
 	return cardInfo;
 end
 
--- local allCards = CardUtil.getAllCardsWithNoKings()
--- local playerCards , otherCards = CardUtil.get13cards(allCards)
--- print_lua_table(playerCards)
+local allCards = CardUtil.getAllCardsWithNoKings()
+local shuffleCards = CardUtil.shuffleCards(allCards)
+local playerCards , otherCards = CardUtil.get13cards(allCards)
+-- print_lua_table(allCards)
 -- print("===================")
 -- print_lua_table(otherCards)
 
-local tab = {{}, {}, {}, {}}
-table.insert(tab[1], 22)
 
-print_lua_table(tab)
+
+function randomInt(max_num, min_num)
+	local min_num = min_num or 0;
+	local num = max_num - min_num;
+	return (math.floor(math.random() * (num + 1) * (num + 1)) % (num + 1)) + min_num;
+end
+
+function outBetTrueCard(Cards)
+	-- random from(1~4) to get the number true cards
+	local trueCardsList = findTrueCardList(Cards)
+
+	-- 得到有效的真牌表(剔除空table)
+	for k , v in pairs(trueCardsList) do 
+		if v and type(v) and not next(v) then
+			table.remove(trueCardsList, k )
+		end
+	end
+
+	-- 从有效表中随机一组出来
+	local cardsNum = randomInt(#trueCardsList , 1)
+	local tempCards = trueCardsList[cardsNum]
+
+	-- random from(1~num);得到真牌组内出哪张真牌
+	local num = randomInt(#tempCards or 1, 1)
+	local trueCards = tempCards[num]
+
+	local betCards ={}
+	betCards.num = 	cardsNum
+	betCards.value = trueCards.cardValue;
+
+	print_lua_table(trueCards)
+	return trueCards , betCards
+end
+
+
+function findTrueCardList(Cards)
+	-- 将手剩牌根据 cardValue等于3~15放置于一个表cardsList内 
+	local cardsValue = CardUtil.getCardsValue()
+	local cardsList = {}
+	local i = 0
+	for _ , value in ipairs(cardsValue) do
+		i = i + 1
+		cardsList[i] = {}
+		for k , v in ipairs(Cards) do 
+			if value == v.cardValue then
+				table.insert(cardsList[i] , v)
+			end
+		end
+	end
+
+	-- 将表cardsList内拥有的牌的张数[0-4](即子表的个数)将其存于trueCardsList中
+	-- 即得到一张真牌表(里面有4个子表~分别存放n=1,2,3,4张真牌的表)
+	local tempList = {0,1,2,3,4}
+	local trueCardsList = {{} , {}, {}, {}}
+	for k,v in ipairs(cardsList) do 
+		if     v and #v == tempList[1] then
+			-- do noting 
+		elseif v and #v == tempList[2] then 
+			table.insert( trueCardsList[1] , v)
+		elseif v and #v == tempList[3] then 
+			table.insert( trueCardsList[2] , v)
+		elseif v and #v == tempList[4] then 
+			table.insert( trueCardsList[3] , v)
+		elseif v and #v == tempList[5] then 
+			table.insert( trueCardsList[4] , v)
+		end 
+	end
+	return trueCardsList
+end
+
+outBetTrueCard(playerCards)
