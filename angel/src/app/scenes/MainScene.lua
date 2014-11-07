@@ -8,20 +8,9 @@ function MainScene:ctor()
 		:align(display.CENTER,display.cx , display.cy)
 		:addTo(self)
 
-    cc.ui.UILabel.new({UILabelType = 2, text = "Hello, World Every@Chen And @Wu!", size = 64})
+    cc.ui.UILabel.new({UILabelType = 2, text = "WELCOME OUR GAME",color = cc.c3b(128,99,222), size = 96})
         :align(display.CENTER, display.cx, display.cy)
         :addTo(self)
-
-
-    cc.ui.UIPushButton.new({
-        normal = "GreenScale9Block.png",
-        pressed = "GreenScale9Block.png",
-        disabled = "GreenScale9Block.png"})
-    	:align(display.CENTER, display.cx, display.cy+100)
-    	:onButtonClicked(function()
-    		print("MainScene ctor Button Click~~~~~~~~~~~~~~~~~~")
-    	end)
-    	:addTo(self)
 end
 
 function MainScene:onEnter()
@@ -33,10 +22,10 @@ end
 
 function MainScene:createScene()
 	print("MainScene createScene-----------------------------");
+	printInfo("MainScene createScene-----------------------------")
+	printLog("WARN", "Network connection lost at %d", os.time())
 	
-	-- local singleScene = require(GameRoomPath.."singleRoomScene/singleScene").new()
-	-- print(singleScene)
-	-- display.replaceScene(singleScene,"fade",0.5, display.COLOR_WHITE)
+	
 	-- local scene = display.newScene(name)
 	-- local node = singleScene.new(name)
 	-- scene:addChild(node)
@@ -52,6 +41,7 @@ function MainScene:createScene()
         borderWidth = 10
     })
     :addTo(self);
+
 
     display.newPolygon(
         {
@@ -69,16 +59,35 @@ function MainScene:createScene()
 	    disabled = "GreenButton.png",
     }
 
-	cc.ui.UIPushButton.new(images,{scale9 = true}):setButtonSize(200,80):setButtonLabel("normal",cc.ui.UILabel.new({
+	cc.ui.UIPushButton.new(images,{scale9 = true})
+		:setButtonSize(200,80):setButtonLabel("normal",cc.ui.UILabel.new( {
             UILabelType = 2,
-            text = "切换",
+            text = "登录",
             size = 48,
-            color = cc.c3b(255,0,0)
-        })):onButtonClicked(function(event)
+            color = cc.c3b(255,0,0)} ))
+        :onButtonClicked(function(event)
            local roomScene = require("app.scenes.RoomScene").new();
            display.replaceScene(roomScene, "splitCols", 0.6, cc.TRANSITION_ORIENTATION_UP_OVER)
+        end)
+        :align(display.CENTER,display.cx,display.cy+200):addTo(self);
 
-        end):align(display.CENTER,display.cx,display.cy+200):addTo(self);
+
+    cc.ui.UIPushButton.new({
+	    normal = "GreenButton.png",
+	    pressed = "GreenScale9Block.png",
+	    disabled = "GreenButton.png"} , {scale9 = true})
+    :setButtonSize(200,80):setButtonLabel("normal",cc.ui.UILabel.new( {
+            UILabelType = 2,
+            text = "单机",
+            size = 48,
+            color = cc.c3b(255,0,0)} ))
+	:align(display.CENTER, display.cx, display.cy-100)
+	:onButtonClicked(function()
+		local singleScene = require(GameRoomPath.."singleRoomScene/singleScene").new()
+		display.replaceScene(singleScene,"slideInR",0.5, display.COLOR_WHITE)
+	end)
+	:addTo(self)
 end
+
 
 return MainScene

@@ -263,4 +263,4 @@ function findTrueCardList(Cards)
 	return trueCardsList
 end
 
-outBetTrueCard(playerCards)
+-- outBetTrueCard(playerCards)

@@ -15,10 +15,10 @@ end
 function SinglePlayer:thinkHowGame()
 end
 
-function GameAiPlayer:sortCards(cards)
+function SinglePlayer:sortCards(cards)
 
 end
 
-function GameAiPlayer:outCard(cards, count)
+function SinglePlayer:outCard(cards, count)
 
 end

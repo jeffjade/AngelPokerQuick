@@ -186,8 +186,8 @@ function RoomCache:getPlayerNum()
 end
 
 -- removePlayer
---		player : room_player
---		return : number - direction(1~4)
+--	player : room_player
+--	return : number - direction(1~4)
 function RoomCache:calcPlayerDirection(player)
 	local me_mid = PhpInfo:getMid();
 	if player:getMid() == me_mid then

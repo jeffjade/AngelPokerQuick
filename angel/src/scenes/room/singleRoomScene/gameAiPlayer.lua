@@ -126,7 +126,7 @@ function GameAiPlayer:findTrueCardList(Cards)
 	return trueCardsList
 end
 
--- 出真牌(即out bet牌 不一致)
+-- 出假牌(即out bet牌 不一致)
 function GameAiPlayer:outBetFalseCard()
 	
 end

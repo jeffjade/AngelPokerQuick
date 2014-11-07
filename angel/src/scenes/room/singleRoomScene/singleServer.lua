@@ -19,11 +19,19 @@ end
 
 function SingleServer:init()
 	self.mRoomInfo =  require(GameRoomPath.."roomCache").new()
+
+	self:addEventListener("SERVER_EVENT_GAME_READY", self.onGameReadyEvent)
+	self:addEventListener("SERVER_EVENT_PLAY_START", self.onPlayStartEvent)
 end
+
+
+function SingleServer:onGameReadyEvent()
+	self:addMachine();
+end
+
 
 function SingleServer:addMachine()
 	local maxPlayerNum = SingleMaxPlayerNum
-	local cAiPlayer = new(GameAiPlayer);
 
 	local singleRobotData = {}
 	for k, v in pairs(singleRobot) do
@@ -35,6 +43,7 @@ function SingleServer:addMachine()
 		mid = mid + 1
 		self.mAiCount = mid
 
+		local cAiPlayer = new(GameAiPlayer);
 		cAiPlayer:setMid(mid)
 		cAiPlayer:setMoney(999999)
 
