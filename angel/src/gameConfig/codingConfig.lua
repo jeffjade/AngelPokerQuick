@@ -10,6 +10,8 @@ require("common/toolUtil")
 require("logic/bit")
 require("logic/cardType")
 
+-- ----------------------------Game Data-------------------------------------
+require("gameData/phpInfo")
 
 -- ------------------------------sockets-------------------------------------
 require("sockets/socketManager")

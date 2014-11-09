@@ -2,7 +2,8 @@
 -- Date : 2013.10.30
 -- Auth : JeffYang
 
-RoomCache = {}
+RoomCache = class("RoomCache")
+
 function RoomCache:ctor()
 	self.mPlayerSeatMap = {};
 	self.mPlayerMap = {};
@@ -158,8 +159,7 @@ function RoomCache:addPlayer(player)
 	end
 end
 
--- removePlayer
---		player : room_player
+-- removePlayer[player]
 function RoomCache:removePlayer(player)
 	local mid = player:getMid();
 	if self.mPlayerMap[mid] then
@@ -174,9 +174,9 @@ function RoomCache:removePlayer(player)
 	end
 end
 
--- findPlayerByMid
--- mid : number
--- return : room_player
+--[[ findPlayerByMid
+    @Param : mid(number)
+	@return : roomPlayer]]
 function RoomCache:findPlayerByMid(mid)
 	return self.mPlayerMap and self.mPlayerMap[mid];
 end
@@ -264,3 +264,5 @@ function RoomCache:findPlayerBySeat(seat)
 	end
 	return nil;
 end
+
+return RoomCache

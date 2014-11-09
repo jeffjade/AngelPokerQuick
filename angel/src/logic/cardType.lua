@@ -5,12 +5,6 @@
 require "bit"
 CardType = {};
 
-CardType.CT_ERROR  = 0;      --  0.错误
-CardType.CT_SINGLE = 1;      --  1.单牌
-CardType.CT_DOUBLE = 2;      --  2.对牌
-CardType.CT_THREE  = 3;      --  3.三张
-CardType.CT_FOUR   = 4;      --  4.四张
-
 function print_lua_table (lua_table, indent)
     if not lua_table or type(lua_table) ~= "table" then
         return;
@@ -47,6 +41,11 @@ function print_lua_table (lua_table, indent)
     end
 end
 
+CardType.CT_ERROR  = 0;      --  0.错误
+CardType.CT_SINGLE = 1;      --  1.单牌
+CardType.CT_DOUBLE = 2;      --  2.对牌
+CardType.CT_THREE  = 3;      --  3.三张
+CardType.CT_FOUR   = 4;      --  4.四张
 
 CardUtil = {};
 
@@ -76,7 +75,6 @@ CardUtil.getAllCards = function()
 
 	return cardInfos;
 end
-
 
 CardUtil.getAllCardsWithNoKings = function()
 	local cards = {}
@@ -124,8 +122,7 @@ CardUtil.get13cards = function(cards)
 	local index = 1;
 	for i = 1, 13 do
 		math.randomseed(tostring(os.time()):reverse():sub(1, 6))
-		index = math.random(#cards);
-		print("*****"..index)
+		index = math.random(#cards);  -- 这个值得随机度不够(不够随机)
 		list[i] = cards[index];
 		table.remove(cards, index);
 	end
@@ -185,12 +182,24 @@ CardUtil.getCardInfo = function(cardByte)
 	return cardInfo;
 end
 
+-- 按照牌面的大小对牌进行排序[14.11.08]
+CardUtil.sortCardsByValue = function(cards)
+	table.sort(cards, 
+		function(a , b) 
+			return a.cardValue > b.cardValue
+		end)
+	return cards
+end
+
 local allCards = CardUtil.getAllCardsWithNoKings()
 local shuffleCards = CardUtil.shuffleCards(allCards)
 local playerCards , otherCards = CardUtil.get13cards(allCards)
--- print_lua_table(allCards)
+playerCards = CardUtil.sortCardsByValue(playerCards)
+-- print_lua_table(playerCards)
 -- print("===================")
 -- print_lua_table(otherCards)
+
+
 
 
 

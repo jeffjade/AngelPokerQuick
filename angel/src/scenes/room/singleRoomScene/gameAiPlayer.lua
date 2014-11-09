@@ -2,7 +2,8 @@
 -- Date : 2014.10.28   19:45
 -- Auth : JeffYang
 
-GameAiPlayer = class(roomPlayer)
+local roomPlayer = require(GameRoomPath.."roomPlayer")
+GameAiPlayer = class("GameAiPlayer" , roomPlayer)
 
 function GameAiPlayer:ctor()
 
@@ -143,3 +144,5 @@ end
 function GameAiPlayer:turnCard()
 	
 end
+
+return GameAiPlayer

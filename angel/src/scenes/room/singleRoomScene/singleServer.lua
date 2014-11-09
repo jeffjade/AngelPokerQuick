@@ -5,7 +5,8 @@
 require("logic/cardType")
 
 local singleRobot = require("scenes/room/singleRoomScene/singleRobot")
-SingleServer = class("SingleServer")
+SingleServer = class("SingleServer" , function()
+    return display.newScene("SingleScene") end)
 
 local SingleMaxPlayerNum = 4
 
@@ -18,14 +19,17 @@ function SingleServer:dtor()
 end
 
 function SingleServer:init()
+	print("SingleServer:~~~~~init")
 	self.mRoomInfo =  require(GameRoomPath.."roomCache").new()
 
-	self:addEventListener("SERVER_EVENT_GAME_READY", self.onGameReadyEvent)
-	self:addEventListener("SERVER_EVENT_PLAY_START", self.onPlayStartEvent)
+	local myApp = require("app.MyApp").new()
+	myApp:addEventListener("SERVER_EVENT_GAME_READY", self.onGameReadyEvent)
+	myApp:addEventListener("SERVER_EVENT_PLAY_START", self.onPlayStartEvent)
 end
 
 
 function SingleServer:onGameReadyEvent()
+	print("SingleServer:~~~~~onGameReadyEvent")
 	self:addMachine();
 end
 
@@ -38,12 +42,12 @@ function SingleServer:addMachine()
 		singleRobotData[k] = v;
 	end
 
-	for i = 1, maxPlayerNum-1  do 
-		local mid = self.mAiCount or 100
+	for i = 1, maxPlayerNum - 1  do 
+		local mid = self.mAiCount or 101
 		mid = mid + 1
 		self.mAiCount = mid
 
-		local cAiPlayer = new(GameAiPlayer);
+		local cAiPlayer = import(GameRoomPath.."singleRoomScene/gameAiPlayer").new()
 		cAiPlayer:setMid(mid)
 		cAiPlayer:setMoney(999999)
 
@@ -58,11 +62,14 @@ function SingleServer:addMachine()
 		cAiPlayer:setSeat(mid - 100);
 
 		-- 设置随机出来的战绩情形
-		local cWinRate = ToolUtil.randomInt(80, 20);
-		local count = ToolUtil.randomInt(level * level * 25, level * level * 5);
-		local cWinCount = math.floor(count * cWinRate * 0.01);
-		cAiPlayer:setWinCount(cWinCount);
-		cAiPlayer:setLoseCount(count - cWinCount);
+		local level = ToolUtil.randomInt(99 , 11)
+		local cWinRate = ToolUtil.randomInt(80, 20)
+		local count = ToolUtil.randomInt(level * level * 25, level * level * 5)
+		local cWinCount = math.floor(count * cWinRate * 0.01)
+		cAiPlayer:setWinCount(cWinCount)
+		cAiPlayer:setLoseCount(count - cWinCount)
+
+		self.mRoomInfo:addPlayer(cAiPlayer)
 
 		self:playEnterRoom(mid)
 	end
@@ -70,12 +77,14 @@ end
 
 -- Enter Room
 function SingleServer:playEnterRoom(mid)
-	local meMid = self.getMeMid()
+	local meMid = 100-- self:getMeMid()
 	if mid and meMid then
 		if mid ~= meMid then 
 			local player = self:findPlayerByMid(mid)
 			player:setIsReady(true)
-			player:playerReady()
+			self:playerReady()
+		else
+			self:playerReady()
 		end
 	end
 end
@@ -106,6 +115,7 @@ function SingleServer:dealCards()
 		local player = self:findPlayerByDirection(i)
 		player:setPlayerCards(playerCards)
 		player:sortPlayerCards()   -- 将玩家的牌排序
+
 		print_lua_table(playerCards)-------------------------*********
 	end
 
@@ -166,6 +176,16 @@ function SingleServer:findStandsOutMid()
 	end
 end
 
+function SingleServer:findPlayerByMid(mid)
+	local player = self.mRoomInfo:findPlayerByMid(mid)
+	return player
+end
+
+function SingleServer:findPlayerByDirection(direction)
+	local player = self.mRoomInfo:findPlayerByDirection(direction)
+	return player
+end
+
 -- 遍历手牌找“红桃3”所属的玩家mid
 function SingleServer:isHaveRed3Card(Cards)
 	Cards = Cards or {}
@@ -180,7 +200,9 @@ function SingleServer:isAllPlayerReadyFlag()
 	local maxPlayerNum = SingleMaxPlayerNum
 	for i=1 , maxPlayerNum do
 		local player = self:findPlayerByDirection(i)
-		if not player or player:getIsReady() then 
+		print(player:getIsReady() and "is ready:yes" or "is ready:no")
+		if not player or player:getIsReady() then
+			print("~~no player or no ready")
 			return false
 		end
 	end
@@ -194,3 +216,5 @@ end
 function SingleServer:setCurrentPlayer(mid)
 	
 end
+
+return SingleServer
