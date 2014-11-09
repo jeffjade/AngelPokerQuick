@@ -213,10 +213,11 @@ function outBetTrueCard(Cards)
 	-- random from(1~4) to get the number true cards
 	local trueCardsList = findTrueCardList(Cards)
 
-	-- 得到有效的真牌表(剔除空table)
+	-- 得到3有效的真牌表(剔除空table)
 	for k , v in pairs(trueCardsList) do 
-		if v and type(v) and not next(v) then
+		if v and type(v) == "table" and not next(v) then
 			table.remove(trueCardsList, k )
+			trueCardsList[k] = nil
 		end
 	end
 
@@ -226,6 +227,7 @@ function outBetTrueCard(Cards)
 
 	-- random from(1~num);得到真牌组内出哪张真牌
 	local num = randomInt(#tempCards or 1, 1)
+	print_lua_table(trueCardsList)
 	local trueCards = tempCards[num]
 
 	local betCards ={}

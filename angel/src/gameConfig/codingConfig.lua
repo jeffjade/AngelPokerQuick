@@ -5,6 +5,7 @@
 -- ------------------------------Common------------------------------------
 require("common/constants")
 require("common/toolUtil")
+require("common/queueUtils")
 
 -- ------------------------------Logic-------------------------------------
 require("logic/bit")
@@ -12,6 +13,7 @@ require("logic/cardType")
 
 -- ----------------------------Game Data-------------------------------------
 require("gameData/phpInfo")
+require("gameData/eventConstants")
 
 -- ------------------------------sockets-------------------------------------
 require("sockets/socketManager")

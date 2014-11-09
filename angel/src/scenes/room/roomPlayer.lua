@@ -79,9 +79,28 @@ function RoomPlayer:setIsReady(ready)
 end
 
 function RoomPlayer:getIsReady()
-	return slef.mReady
+	return self.mReady
 end
 
+function RoomPlayer:setDirection(direction)
+	self.mDirection = direction;
+end
+
+function RoomPlayer:getDirection()
+	return self.mDirection or 0;
+end
+
+function RoomPlayer:setPlayerCards(cards)
+	self.mPlayerCards = cards
+end
+
+function RoomPlayer:getPlayerCards()
+	return self.mPlayerCards
+end
+
+function RoomPlayer:sortPlayerCards()
+	-- 对玩家的手牌进行排序
+end
 
 function RoomPlayer:setOutCards(_num, _types, _cards)
 	self.mOutCards = { count = _num; types = _types, cards = _cards };

@@ -79,15 +79,6 @@ function RoomCache:getAllPlayerInfo()
 	return self.mPlayerMap or {};
 end
 
-function RoomCache:findPlayerByDirection(direction)
-	return self.mPlayerSeatMap[direction];
-end
-
-function RoomCache:findNextPlayerByDirection(direction)
-	return self.mPlayerSeatMap[direction % self.mPlayerMaxNum + 1];
-end
-
-
 function RoomCache:setCurrentPlayer(mid)
 	self.mCurrentPlayerMid = mid;
 end
@@ -154,8 +145,10 @@ function RoomCache:addPlayer(player)
 		self.mPlayerNum = self.mPlayerNum + 1;
 	end
 	self.mPlayerMap[mid] = player;
+	print("%%%%%%%%%%%%%%%%%%%mid = "..mid)
 	if mid == PhpInfo:getMid() then
 		self.mMySelf = player;
+		self:setMe(player)
 	end
 end
 
@@ -185,23 +178,6 @@ function RoomCache:getPlayerNum()
 	return self.mPlayerNum;
 end
 
--- removePlayer
---	player : room_player
---	return : number - direction(1~4)
-function RoomCache:calcPlayerDirection(player)
-	local me_mid = PhpInfo:getMid();
-	if player:getMid() == me_mid then
-		return 1;
-	end
-	local me = self.mMySelf;
-	if me then
-		local me_seat = me:getSeat();
-		local player_seat = player:getSeat();
-		local direction = (self.mPlayerMaxNum + player_seat - me_seat) % self.mPlayerMaxNum + 1;
-		return direction;
-	end
-	return 0;
-end
 
 function RoomCache:getMe()
 	return self.mMySelf;
@@ -219,33 +195,52 @@ end
 
 function RoomCache:updateDirection(player)
 	local direction = self:calcPlayerDirection(player);
+	print("============updateDirection===================direction==============="..direction)
 	self:changePlayerDirection(player, direction);
 end
 
---	change_player_seat
---	player : room_player
---	seat   : number
---	return : boolean
+--[[removePlayer
+	@Param : player : roomPlayer
+	@return : numbe -direction(1~4)]]
+function RoomCache:calcPlayerDirection(player)
+	local me_mid = PhpInfo:getMid();
+	if player:getMid() == me_mid then
+		return 1;
+	end
+	local me = self:getMe();
+	print("FFFFFFFFFFF"..me:getMid() )
+	if me then
+		print("++++++++++++++++++++++++++++++++++++++++++++++++++++++me")
+		local meSeat = me:getSeat();
+		local playerSeat = player:getSeat();
+		local direction = (self.mPlayerMaxNum + playerSeat - meSeat) % self.mPlayerMaxNum + 1;
+		return direction;
+	end
+	return 0;
+end
+
+--[[Function : changePlayerSeat
+	@param:player : roomPlayer
+	@param:seat   : number
+	@return : boolean]]
 function RoomCache:changePlayerDirection(player, direction)
 	if player == nil then
 		return;
 	end
 
-	local old_direction = player:getDirection();
-	if self.mPlayerSeatMap[old_direction] ~= player then
-		old_direction = 0;
+	local oldDirection = player:getDirection();
+	if self.mPlayerSeatMap[oldDirection] ~= player then
+		oldDirection = 0;
 	else
-		self.mPlayerSeatMap[old_direction] = nil;
+		self.mPlayerSeatMap[oldDirection] = nil;
 	end
 	self.mPlayerSeatMap[direction] = player;
 	player:setDirection(direction);
 	return true;
 end
 
--- findPlayerByDirection
--- direction : number - 1~4
--- eturn     : room_player
 function RoomCache:findPlayerByDirection(direction)
+	print("------------------------mPlayerSeatMap = "..(#self.mPlayerSeatMap or 0))
 	return self.mPlayerSeatMap[direction];
 end
 

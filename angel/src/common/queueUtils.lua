@@ -1,28 +1,28 @@
 -- 队列动画工具
-local QueueAnimUtils = class("QueueAnimUtils");
+QueueUtils = class("QueueUtils");
 
-QueueAnimUtils.instance = nil;
+QueueUtils.instance = nil;
 
-function QueueAnimUtils:ctor()
+function QueueUtils:ctor()
 	self.queueAnim = {};
 	self.isPlaying = false;
 end
 
-function QueueAnimUtils:getInstance()
- 	if not QueueAnimUtils.instance then 
-		QueueAnimUtils.instance = QueueAnimUtils.new();
+function QueueUtils:getInstance()
+ 	if not QueueUtils.instance then 
+		QueueUtils.instance = QueueUtils.new();
 	end
-	return QueueAnimUtils.instance;
+	return QueueUtils.instance;
 end
 
 --同步执行方法,加进来的方法会直接执行，不用手动调用asyncDelayCommand
-function QueueAnimUtils:sychronizedDelayCommand(obj,funcName,second,...)
+function QueueUtils:sychronizedDelayCommand(obj,funcName,second,...)
 	self:addAnimForQueue(obj,funcName,second,...);
 	self:asyncDelayCommand();
 end
 
 --添加需要执行的队列动画方法(对象，函数名，时间，函数参数)
-function QueueAnimUtils:addAnimForQueue(obj,funcName,second,...)
+function QueueUtils:addAnimForQueue(obj,funcName,second,...)
 	local queueFunc = {};
 	queueFunc.object = obj;
 	
@@ -35,7 +35,7 @@ function QueueAnimUtils:addAnimForQueue(obj,funcName,second,...)
 end
 
 --异步执行这个方法，但之前必须要addAnimForQueue
-function QueueAnimUtils:asyncDelayCommand()
+function QueueUtils:asyncDelayCommand()
 	if self.queueAnim then 
 		local scheduler = require("framework.scheduler");
 		for i=1,#self.queueAnim do 
@@ -55,5 +55,3 @@ function QueueAnimUtils:asyncDelayCommand()
 		end
 	end
 end
-
-return QueueAnimUtils;

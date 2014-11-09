@@ -2,7 +2,8 @@
 -- Date : 2014.10.30
 -- Auth : JeffYang
 
-SinglePlayer = class("SinglePlayer")
+local roomPlayer = require(GameRoomPath.."roomPlayer")
+SinglePlayer = class("SinglePlayer", roomPlayer)
 
 function SinglePlayer:ctor()
 
@@ -22,3 +23,5 @@ end
 function SinglePlayer:outCard(cards, count)
 
 end
+
+return SinglePlayer

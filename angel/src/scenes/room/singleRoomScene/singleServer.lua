@@ -10,7 +10,7 @@ SingleServer = class("SingleServer" , function()
 
 local SingleMaxPlayerNum = 4
 
-function SingleServer:ctor()
+function SingleServer:ctor() 
 	self:init()
 end
 
@@ -19,20 +19,36 @@ function SingleServer:dtor()
 end
 
 function SingleServer:init()
-	print("SingleServer:~~~~~init")
+	print("SingleServer:~~~~~init\n")
+
 	self.mRoomInfo =  require(GameRoomPath.."roomCache").new()
 
-	local myApp = require("app.MyApp").new()
-	myApp:addEventListener("SERVER_EVENT_GAME_READY", self.onGameReadyEvent)
-	myApp:addEventListener("SERVER_EVENT_PLAY_START", self.onPlayStartEvent)
+	cc.GameObject.extend(self):addComponent("components.behavior.EventProtocol"):exportMethods()
+	self:addEventListener(kSingleGameReadyEv , handler(self, self.onGameReadyEvent))
+	self:addEventListener(kSingleGamePlayStartEv , handler(self, self.onPlayStartEvent))
 end
-
 
 function SingleServer:onGameReadyEvent()
 	print("SingleServer:~~~~~onGameReadyEvent")
+	self:addPlayereSelf()
 	self:addMachine();
 end
 
+function SingleServer:addPlayereSelf()
+	self.mMySelfPlayer = require(GameRoomPath.."singleRoomScene/singlePlayer").new()
+	local meMid = 100
+    self.mMySelfPlayer:setMid(meMid)
+    PhpInfo:setMid(meMid)
+
+    self.mMySelfPlayer:setSex(1)
+    self.mMySelfPlayer:setMoney(888)
+    self.mMySelfPlayer:setIsReady(true)
+    self.mMySelfPlayer:setSeat(0)
+    -- self:playEnterRoom(meMid)
+    
+    self.mRoomInfo:addPlayer(self.mMySelfPlayer)
+    self.mRoomInfo:updateDirection(self.mMySelfPlayer);
+end
 
 function SingleServer:addMachine()
 	local maxPlayerNum = SingleMaxPlayerNum
@@ -43,12 +59,12 @@ function SingleServer:addMachine()
 	end
 
 	for i = 1, maxPlayerNum - 1  do 
-		local mid = self.mAiCount or 101
+		local mid = self.mAiCount or 10000000
 		mid = mid + 1
 		self.mAiCount = mid
 
 		local cAiPlayer = import(GameRoomPath.."singleRoomScene/gameAiPlayer").new()
-		cAiPlayer:setMid(mid)
+		cAiPlayer:setMid(self.mAiCount)
 		cAiPlayer:setMoney(999999)
 
 		local cAiRobot, index = ToolUtil.randomItem(singleRobotData);
@@ -59,7 +75,7 @@ function SingleServer:addMachine()
 		cAiPlayer:setIcon(icon);
 		cAiPlayer:setSex(sex);
 		cAiPlayer:setNick(nick);
-		cAiPlayer:setSeat(mid - 100);
+		cAiPlayer:setSeat(mid - 10000000);
 
 		-- 设置随机出来的战绩情形
 		local level = ToolUtil.randomInt(99 , 11)
@@ -72,27 +88,33 @@ function SingleServer:addMachine()
 		self.mRoomInfo:addPlayer(cAiPlayer)
 
 		self:playEnterRoom(mid)
+		self.mRoomInfo:updateDirection(cAiPlayer)
 	end
+
+	self:playReady()
 end
 
 -- Enter Room
 function SingleServer:playEnterRoom(mid)
-	local meMid = 100-- self:getMeMid()
+	local meMid = 100 -- self:getMeMid()
 	if mid and meMid then
 		if mid ~= meMid then 
 			local player = self:findPlayerByMid(mid)
 			player:setIsReady(true)
 			self:playerReady()
-		else
-			self:playerReady()
 		end
 	end
 end
 
--- 玩家准备~发牌喽
 function SingleServer:playerReady()
+
+end
+
+-- 玩家准备~发牌喽
+function SingleServer:playReady()
 	local isAllPlayerReadyFlag = self:isAllPlayerReadyFlag()
 	if isAllPlayerReadyFlag then
+		print("SingleServer:playerReady()==============================")
 		self:dealCards()
 	end
 end
@@ -105,6 +127,7 @@ function SingleServer:dealCards()
 	-- for i = 1, maxPlayerNum do
 	-- end
 	local allCards = CardUtil.getAllCardsWithNoKings()
+	allCards = CardUtil.shuffleCards(allCards)  --洗牌
 	local otherCards = allCards
 
 	-- Set Player Cards
@@ -116,7 +139,7 @@ function SingleServer:dealCards()
 		player:setPlayerCards(playerCards)
 		player:sortPlayerCards()   -- 将玩家的牌排序
 
-		print_lua_table(playerCards)-------------------------*********
+		print_lua_table(playerCards)
 	end
 
 	self:playStart()
@@ -128,18 +151,21 @@ function SingleServer:playStart()
 
 	for k,v in pairs(self.mRoomInfo.mPlayerSeatMap) do 
 		if v:getMid() ~= firstPlayPlayerMid then
-			v:setTeam(2)
+			-- v:setTeam(2)  -- 未曾完全想好
 		else
-			v:setTeam(1)
+			-- v:setTeam(1)
 		end
-		v:setReady(false);
+		-- v:setReady(false);
 	end
 	self.mRoomInfo:setCurrentPlayer(firstPlayPlayerMid)
 	self.mRoomInfo:setNextPlayer(0);
 	
 	-- StateMachine:getInstance():pushCommand(firstPlayer.thinkHowGame, firstPlayer);
+	QueueUtils:getInstance():sychronizedDelayCommand(nil,function()
+		firstPlayer:thinkHowGame()
+		end ,1)
 	-- firstPlayer:thinkHowGame()
-	self:dispatchEvent({name = "SERVER_EVENT.PLAY_START"})
+	-- self:dispatchEvent({name = "SERVER_EVENT.PLAY_START"})
 end
 
 function SingleServer:onPlayStartEvent()
@@ -165,7 +191,7 @@ end
 -- 遍历每个玩家的牌,找到红桃3所属玩家的mid
 function SingleServer:findStandsOutMid()
 	local maxPlayerNum = SingleMaxPlayerNum
-	for i=i, maxPlayerNum do
+	for i = 1, maxPlayerNum do
 		local player = self:findPlayerByDirection(i)
 		local playerCards = player:getPlayerCards()
 		local isRed3CardsFlag = self:isHaveRed3Card(playerCards)
@@ -182,6 +208,7 @@ function SingleServer:findPlayerByMid(mid)
 end
 
 function SingleServer:findPlayerByDirection(direction)
+	print("SingleServer:findPlayerByDirection======")
 	local player = self.mRoomInfo:findPlayerByDirection(direction)
 	return player
 end
@@ -198,11 +225,11 @@ end
 
 function SingleServer:isAllPlayerReadyFlag()
 	local maxPlayerNum = SingleMaxPlayerNum
-	for i=1 , maxPlayerNum do
+	for i = 1 , maxPlayerNum do
 		local player = self:findPlayerByDirection(i)
-		print(player:getIsReady() and "is ready:yes" or "is ready:no")
-		if not player or player:getIsReady() then
-			print("~~no player or no ready")
+		print("iiiiiiiiii==  "..i)
+		print( player:getIsReady() and "is ready:YES!!!" or "is ready:NO???")
+		if not player or not player:getIsReady() then
 			return false
 		end
 	end

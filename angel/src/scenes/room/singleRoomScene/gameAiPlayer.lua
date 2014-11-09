@@ -6,7 +6,7 @@ local roomPlayer = require(GameRoomPath.."roomPlayer")
 GameAiPlayer = class("GameAiPlayer" , roomPlayer)
 
 function GameAiPlayer:ctor()
-
+	self.mRoomInfo = require(GameRoomPath.."roomCache").new()
 end
 
 function GameAiPlayer:dtor()
@@ -18,7 +18,7 @@ function GameAiPlayer:setMoney()
 end
 
 function GameAiPlayer:getRoomInfo()
-	self.mRoomInfo = require(GameRoomPath.."roomCache").new()
+	return self.mRoomInfo
 end
 
 function GameAiPlayer:thinkHowGame()
@@ -36,7 +36,6 @@ function GameAiPlayer:thinkHowGame()
 		if #outCards == 0 then
 			local i = 0;
 		end
-		-- RoomCardTools.print_cards("out cards: " .. outType .. " ", outCards);
 		self:setOutCards(#outCards, outType, outCards);
 
 		self.mMyCardsChanged = true;
@@ -50,8 +49,8 @@ end
 function GameAiPlayer:outFirstCard()
 	local outCards , betCards
 	-- first out card: random from true(1) and false(0)
-	local betCardsFlag = ToolUtil.ToolUtil.randomInt(1 , 0)
-	if betCardsFlag == 1 then 
+	local betCardsFlag = ToolUtil.randomInt(1 , 0)
+	if betCardsFlag == 1 then
 		outCards , betCards = self:outBetTrueCard()
 	elseif betCardsFlag == 0 then 
 		outCards , betCards = self:outBetFalseCard()
@@ -73,6 +72,7 @@ function GameAiPlayer:outBetTrueCard(Cards)
 	for k , v in pairs(trueCardsList) do 
 		if v and type(v) and not next(v) then
 			table.remove(trueCardsList, k )
+			trueCardsList[k] = nil
 		end
 	end
 

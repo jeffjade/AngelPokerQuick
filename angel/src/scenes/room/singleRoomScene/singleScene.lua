@@ -6,28 +6,22 @@ local SingleScene = class("SingleScene", function()
     return display.newScene("SingleScene") 
 end)
 
+SingleScene.GAME_READY = "singleGameReadyEvent"
+SingleScene.PLAY_START = "singlePlayStartEvent"
+
+
 function SingleScene:ctor()
     cc.ui.UILabel.new({UILabelType = 2, text = "HERE IS OUER SINGLE GAME", size = 64})
         :align(display.CENTER, display.cx, display.top-64)
         :addTo(self)
 
-    printLog("==========================")
     self:init()
 end
 
 function SingleScene:init()
     self.mGameServer = require(GameRoomPath.."singleRoomScene/singleServer").new()
+
     self.mRoomInfo =  require(GameRoomPath.."roomCache").new()
-
-    self.mMySelfPlayer = require(GameRoomPath.."roomPlayer").new()
-    self.mMySelfPlayer:setMid(100)
-    self.mMySelfPlayer:setSex(1)
-    self.mMySelfPlayer:setMoney(888)
-    self.mMySelfPlayer:setIsReady(true)
-    self.mMySelfPlayer:setSeat(1)
-
-    self.mGameServer:playEnterRoom(100)
-    self.mRoomInfo:addPlayer(self.mMySelfPlayer)
 end
 
 function SingleScene:onEnter()
@@ -50,13 +44,13 @@ function SingleScene:onEnter()
     end):align(display.CENTER,display.cx,display.cy+100):addTo(self);
 
     -- 分发不过去???(待解决)
-    -- self:dispatchEvent( {name = "SERVER_EVENT_GAME_READY"} )
-    self.mGameServer:onGameReadyEvent()
+    self:dispatchEvents( {name = "singleGameReadyEvent"} )
+
+    -- self.mGameServer:onGameReadyEvent()
 end
 
-function SingleScene:dispatchEvent(eventTable)
-    local myApp = require("app.MyApp").new()
-    myApp:dispatchEvent(eventTable)
+function SingleScene:dispatchEvents(eventTable)
+    self.mGameServer:dispatchEvent(eventTable)
 end
 
 function SingleScene:onExit() 
