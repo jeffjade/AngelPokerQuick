@@ -3,5 +3,11 @@
 -- Auth : JeffYang
 
 -- ===================================SingleSceneConstants==================================
-kSingleGameReadyEv     = "singleGameReadyEvent"
-kSingleGamePlayStartEv = "singleGamePlayStartEvent"
+kSingleGameReadyEv      = EventDispatcher.getInstance():getUserEvent() -- "singleGameReadyEvent"
+kSingleGamePlayStartEv  = EventDispatcher.getInstance():getUserEvent() -- "singleGamePlayStartEvent"
+kSingleOutCardEv        = EventDispatcher.getInstance():getUserEvent()
+kSingleTurnCardEv       = EventDispatcher.getInstance():getUserEvent()
+
+kServerPlayerOutCardsEv = EventDispatcher.getInstance():getUserEvent()
+kServerPlayNextEv       = EventDispatcher.getInstance():getUserEvent()
+kServerPlayNewTurnEv    = EventDispatcher.getInstance():getUserEvent()

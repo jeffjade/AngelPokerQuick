@@ -14,14 +14,50 @@ function SinglePlayer:dtor()
 end
 
 function SinglePlayer:thinkHowGame()
+	print("GameAiPlayer:thinkHowGame()~~~~~~~")
 end
 
 function SinglePlayer:sortCards(cards)
 
 end
 
-function SinglePlayer:outCard(cards, count)
+function SinglePlayer:removeCard(count ,info)
+	local curCount = self.mPlayerCards.count;
+	local cards = self.mPlayerCards.cards;
+	local tmp = {};
+	for j = 1, count do
+		tmp[j] = info[j];
+	end
+	
+	local new_cards = {};
+	local new_count = 0;
+	for j = 1, curCount do
+		local card = cards[j];
+		local found = false;
+		for i = 1, count do
+			if card.cardByte == tmp[i].cardByte then
+				table.remove(tmp, i);
+				count = count - 1;
+				found = true;
+				break;
+			end
+		end
+		if not found then
+			new_count = new_count + 1;
+			new_cards[new_count] = card;
+		end
+	end
 
+	self.mPlayerCards.cards = new_cards
+	self.mPlayerCards.count = new_count
+end
+
+function SinglePlayer:outPlayCard()
+	EventDispatcher.getInstance():dispatch(kSingleOutCardEv , self.meMid);
+end
+
+function SinglePlayer:turnPlayCard()
+	EventDispatcher.getInstance():dispatch(kSingleTurnCardEv , self.meMid);
 end
 
 return SinglePlayer

@@ -42,11 +42,9 @@ function SingleScene:onEnter()
            display.replaceScene(mainScene, "slideInB", 0.6)
 
     end):align(display.CENTER,display.cx,display.cy+100):addTo(self);
-
-    -- 分发不过去???(待解决)
-    self:dispatchEvents( {name = "singleGameReadyEvent"} )
-
-    -- self.mGameServer:onGameReadyEvent()
+  
+    -- self:dispatchEvents( {name = "singleGameReadyEvent"} )
+    EventDispatcher.getInstance():dispatch( kSingleGameReadyEv )
 end
 
 function SingleScene:dispatchEvents(eventTable)

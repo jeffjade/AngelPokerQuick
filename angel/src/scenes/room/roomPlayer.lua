@@ -90,8 +90,14 @@ function RoomPlayer:getDirection()
 	return self.mDirection or 0;
 end
 
-function RoomPlayer:setPlayerCards(cards)
-	self.mPlayerCards = cards
+function RoomPlayer:setPlayerCards(_num , _cards)
+	if self.mPlayerCards == nil then
+		self.mPlayerCards = {  count = _num;
+		                       cards = _cards };
+	else
+		self.mPlayerCards.cards = _cards;
+		self.mPlayerCards.count = _num;
+	end
 end
 
 function RoomPlayer:getPlayerCards()
@@ -102,8 +108,11 @@ function RoomPlayer:sortPlayerCards()
 	-- 对玩家的手牌进行排序
 end
 
-function RoomPlayer:setOutCards(_num, _types, _cards)
-	self.mOutCards = { count = _num; types = _types, cards = _cards };
+-- 设置玩家所出的牌[ _count张数; _betCards叫牌信息; _outCards出牌信息]
+function RoomPlayer:setOutCards(_count, _betCards, _outCards)
+	self.mOutCards = {  count = _count; 
+					    betCards = _betCards;
+					    outCards = _outCards }
 end
 
 function RoomPlayer:getOutCards()

@@ -61,48 +61,22 @@ function RoomCache:getLastPlayer()
 	return self.mLastPlayerMid or 0;
 end
 
-function RoomCache:setLastOutCards(_count, _types, _cards)
+-- 保存玩家上家出牌信息[]
+function RoomCache:setLastOutCards(_count, _betCards, _cards)
 	local tmp = {};
 	for k, v in pairs(_cards) do
 		tmp[k] = v;
 	end
-	self.mLastOutCards = { count = _count; types = _types; cards = tmp };
+	self.mLastOutCards = { count = _count; types = _betCards; cards = tmp };
 end
 
 function RoomCache:getLastOutCards()
-	return self.mLastOutCards;
+	return self.mLastOutCards
 end
-
-
 
 function RoomCache:getAllPlayerInfo()
 	return self.mPlayerMap or {};
 end
-
-function RoomCache:setCurrentPlayer(mid)
-	self.mCurrentPlayerMid = mid;
-end
-
-function RoomCache:getCurrentPlayer(mid)
-	return self.mCurrentPlayerMid or 0;
-end
-
-function RoomCache:setNextPlayer(mid)
-	self.mNextPlayerMid = mid;
-end
-
-function RoomCache:getNextPlayer()
-	return self.mNextPlayerMid or 0;
-end
-
-function RoomCache:setLastPlayer(mid)
-	self.mLastPlayerMid = mid;
-end
-
-function RoomCache:getLastPlayer()
-	return self.mLastPlayerMid or 0;
-end
-
 
 --设置最大玩家数
 function RoomCache:setPlayerMaxNum(num)
@@ -140,12 +114,12 @@ end
 
 
 function RoomCache:addPlayer(player)
-	local mid = player:getMid();
+	local mid = player:getMid()
 	if self.mPlayerMap[mid] == nil then
 		self.mPlayerNum = self.mPlayerNum + 1;
 	end
 	self.mPlayerMap[mid] = player;
-	print("%%%%%%%%%%%%%%%%%%%mid = "..mid)
+	print("%%%%%%%%%%%%%%%%%%% mid = "..mid)
 	if mid == PhpInfo:getMid() then
 		self.mMySelf = player;
 		self:setMe(player)
