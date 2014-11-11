@@ -164,8 +164,9 @@ function SingleServer:playStart()
 	-- QueueUtils:getInstance():sychronizedDelayCommand(nil,function()
 	-- 	firstPlayer:thinkHowGame()
 	-- 	end ,1)
+	-- QueueUtils:getInstance():sychronizedDelayCommand(firstPlayer ,
+	-- 	firstPlayer.thinkHowGame ,1)
 	firstPlayer:thinkHowGame()
-	-- self:dispatchEvent({name = "SERVER_EVENT.PLAY_START"})
 end
 
 function SingleServer:nextPlayerPlay()

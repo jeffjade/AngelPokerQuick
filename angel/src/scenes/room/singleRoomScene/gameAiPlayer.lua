@@ -105,7 +105,7 @@ function GameAiPlayer:outBetTrueCard(Cards)
 	betCards.num = 	cardsNum
 	betCards.value = trueCards.cardValue;
 
-	print_lua_table(trueCards)
+	print_lua_table(trueCards)---------@@@
 	return trueCards , betCards
 end
 

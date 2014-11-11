@@ -22,16 +22,9 @@ end
 
 function MainScene:createScene()
 	print("MainScene createScene-----------------------------");
-	printInfo("MainScene createScene-----------------------------")
 	printLog("WARN", "Network connection lost at %d", os.time())
 	
-	
-	-- local scene = display.newScene(name)
-	-- local node = singleScene.new(name)
-	-- scene:addChild(node)
-	-- return scene
 	-- display.newColorLayer(cc.c4b(255, 0, 0,255)):addTo(self);
-
     display.newLine(
     {
         {display.left,display.top},{display.right,display.bottom}
@@ -88,6 +81,5 @@ function MainScene:createScene()
 	end)
 	:addTo(self)
 end
-
 
 return MainScene
