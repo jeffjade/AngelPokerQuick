@@ -11,23 +11,20 @@ function RoomScene:ctor()
     self:addPersonThird()
     self:addSelf()
 
+    local tCards = {}
+    for i = 1, 49 do
+        local card = {}
+        card.cardValue = 1
+        card.cardType = 2
+        tCards[#tCards + 1] = card
+    end
+
 --Debug 加载牌
     local cardui = require(GameRoomPath .. "roomMyCardUI").new()
-    cardui:createCards(2, {{cardValue=1, cardType=2}, {cardValue=2, cardType=3}})
+    cardui:createCards(tCards)
     cardui:placeCard()
-    -- cardui:size(50,50)
-    -- cardui:pos(0, 0)
-    -- self:getCardPanel()
-    -- self.m_cardPanel:addChild(cardui)
-
-    self:addChild(self.rootMainScene)   
-
-    display.addSpriteFrames("card_f.plist", "card_f.png")
-    strNamePic = "#f1.png"
-    local card = display.newSprite(strNamePic)  
-    card:setPosition(400, 400)  
-    card:setContentSize(50, 100)
-    self:addChild(card)
+    self:addChild(self.rootMainScene)  
+    self:addChild(cardui)
 end
 
 -- 加载人物一
@@ -56,14 +53,6 @@ function RoomScene:addSelf()
     local widgetPerson = cc.uiloader:seekNodeByName(self.rootMainScene, "widget_self_person")
     local widgetRootPersonScene =  cc.uiloader:load("widget_self.json") 
     widgetPerson:addChild(widgetRootPersonScene)
-end
-
---获取 牌 panel
-function RoomScene:getCardPanel()
-    if not self.m_cardPanel then
-        self.m_cardPanel = cc.uiloader:seekNodeByName(self.rootMainScene, "widget_card")
-    end
-    return self.m_cardPanel
 end
 
 return RoomScene;
