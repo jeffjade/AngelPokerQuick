@@ -16,6 +16,7 @@ end
 
 function RoomPlayerUi:registerEvent()
 	self.mEventTable = {
+		[kServerDealCardsEv]        = self.onGameDealCardsEvent;
 		[kServerPlayOverEv] 		= self.onGamePlayOverEvent;
 	}
 
@@ -31,13 +32,20 @@ function RoomPlayerUi:unregisterEvent()
 end
 
 -- ************************************LogicHelperFun*********************************************
+function RoomPlayerUi:showMyCard()
 
-
+end
 
 -- ************************************LogicHelperFun*********************************************
 
 
 -- ---------------------------------OnEventCallBack-----------------------------------------------
+function RoomPlayerUi:onGameDealCardsEvent(mid)
+	if mid == PhpInfo.getMid() then
+		self:showMyCard()
+	end
+end
+
 function RoomPlayerUi:onGamePlayOverEvent()
 	print("RoomPlayerUi:onGamePlayOverEvent~~~")
 end

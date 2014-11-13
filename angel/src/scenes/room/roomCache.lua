@@ -67,7 +67,7 @@ function RoomCache:setLastOutCards(_count, _betCards, _cards)
 	for k, v in pairs(_cards) do
 		tmp[k] = v;
 	end
-	self.mLastOutCards = { count = _count; types = _betCards; cards = tmp };
+	self.mLastOutCards = { count = _count; betCards = _betCards; outCards = tmp };
 end
 
 function RoomCache:getLastOutCards()

@@ -147,6 +147,7 @@ function SingleServer:dealCards()
 
 		player:sortPlayerCards()   -- 将玩家的牌排序
 
+		EventDispatcher.getInstance():dispatch( kServerDealCardsEv, player:getMid() );
 		print_lua_table(playerCards)
 	end
 
