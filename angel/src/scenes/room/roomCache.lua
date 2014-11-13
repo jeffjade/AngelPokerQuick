@@ -141,6 +141,12 @@ function RoomCache:removePlayer(player)
 	end
 end
 
+function RoomCache:resetAllPlayers()
+	for k, v in pairs(self.mPlayerSeatMap) do
+		v:reset();
+	end
+end
+
 --[[ findPlayerByMid
     @Param : mid(number)
 	@return : roomPlayer]]
@@ -161,11 +167,25 @@ function RoomCache:setMe(value)
 	self.mMySelf = value;
 end
 
-function RoomCache:resetAllPlayers()
-	for k, v in pairs(self.mPlayerSeatMap) do
-		v:reset();
-	end
+
+function RoomCache:setWinner(mid)
+	self.mWinnerMid = mid
 end
+
+function RoomCache:getWinner()
+	return self.mWinnerMid
+end
+
+
+function RoomCache:setGameOverInfo(_gameInfo , _playerInfo)
+	self.mGameOverInfo = {  gameInfo = _gameInfo,
+ 						    playerInfo = _playerInfo}
+end
+
+function RoomCache:getGameOverInfo()
+	return self.mGameOverInfo
+end
+
 
 function RoomCache:updateDirection(player)
 	local direction = self:calcPlayerDirection(player);

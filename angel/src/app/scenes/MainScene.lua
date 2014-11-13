@@ -4,7 +4,7 @@ local MainScene = class("MainScene", function()
 end)
 
 function MainScene:ctor()
-	cc.ui.UIImage.new("LoginBg.png")
+	cc.ui.UIImage.new("login/LoginBg.png")
 		:align(display.CENTER,display.cx , display.cy)
 		:addTo(self)
 

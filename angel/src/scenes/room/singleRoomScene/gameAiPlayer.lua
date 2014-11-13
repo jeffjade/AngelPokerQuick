@@ -43,16 +43,14 @@ function GameAiPlayer:thinkHowGame()
 	else
 		outCards , betCards = self:outLargeCard(myCards);
 	end
-	print("GameAiPlayer:thinkHowGame()~~~~~~~")
+
 	if #outCards == 0 then 
 		print("GameAiPlayer:thinkHowGame()~~~~~~~ what???")
 	end
+	print("~~~~~~~~GameAiPlayer:ai out cards: ")
 	print_lua_table(outCards)
 
-	if outCards then
-		if #outCards == 0 then
-			local i = 0;
-		end
+	if outCards and next(outCards) then
 		self:setOutCards(#outCards, outType, outCards);
 
 		self.mMyCardsChanged = true;
