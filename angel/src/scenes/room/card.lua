@@ -8,10 +8,10 @@
 
 local CardType = 
 {
-	Fang = 1,
-	Mei  = 2,
-	Hei  = 3,
-	Hong = 4,
+	Hei  = 1,
+	Hong = 2,
+	Mei  = 3,
+	Fang = 4,
 }
 
 local Card = class("Card")
@@ -37,25 +37,25 @@ end
 function Card:createCardF()
 	display.addSpriteFrames("card_f.plist", "card_f.png")
 	strNamePic = "#f" .. self.m_cardValue .. ".png"
-	return display.newSprite(strNamePic)  
+	return cc.ui.UIPushButton.new(strNamePic)
 end
 
 function Card:createCardM()
 	display.addSpriteFrames("card_m.plist", "card_m.png")
-	strNamePic = "#m" .. self.m_cardValue .. ".png"
-	return display.newSprite(strNamePic)  
+	strNamePic = "#m" .. self.m_cardValue .. ".png"  
+	return cc.ui.UIPushButton.new(strNamePic)
 end
 
 function Card:createCardH()
 	display.addSpriteFrames("card_h.plist", "card_h.png")
 	strNamePic = "#h" .. self.m_cardValue .. ".png"
-	return display.newSprite(strNamePic)  
+	return cc.ui.UIPushButton.new(strNamePic)
 end
 
 function Card:createCardR()
 	display.addSpriteFrames("card_r.plist", "card_r.png")
 	strNamePic = "#r" .. self.m_cardValue .. ".png"
-	return display.newSprite(strNamePic)  
+	return cc.ui.UIPushButton.new(strNamePic)
 end
 
 return Card

@@ -14,7 +14,8 @@ GameRoomPath = "scenes/room/"
 
 function MyApp:run()
     cc.FileUtils:getInstance():addSearchPath("res/")
-    self:enterScene("MainScene")
+    self:enterScene("RoomScene")
+    -- self:enterScene("MainScene")
 end
 
 return MyApp

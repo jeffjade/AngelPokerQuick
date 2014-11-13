@@ -11,7 +11,20 @@ function RoomScene:ctor()
     self:addPersonThird()
     self:addSelf()
 
-    self:addChild(self.rootMainScene)   
+    local tCards = {}
+    for i = 1, 49 do
+        local card = {}
+        card.cardValue = 1
+        card.cardType = 2
+        tCards[#tCards + 1] = card
+    end
+
+--Debug 加载牌
+    local cardui = require(GameRoomPath .. "roomMyCardUI").new()
+    cardui:createCards(tCards)
+    cardui:placeCard()
+    self:addChild(self.rootMainScene)  
+    self:addChild(cardui)
 end
 
 -- 加载人物一
