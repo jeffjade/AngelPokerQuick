@@ -114,12 +114,12 @@ function SingleServer:playEnterRoom(mid)
 		if mid ~= meMid then 
 			local player = self:findPlayerByMid(mid)
 			player:setIsReady(true)
-			self:playerReady()
+			self:playerReady(mid)
 		end
 	end
 end
 
-function SingleServer:playerReady()
+function SingleServer:playerReady(mid)
 
 end
 
@@ -147,6 +147,7 @@ function SingleServer:dealCards()
 
 		player:sortPlayerCards()   -- 将玩家的牌排序
 
+		EventDispatcher.getInstance():dispatch( kServerDealCardsEv, player:getMid() );
 		print_lua_table(playerCards)
 	end
 
@@ -181,12 +182,32 @@ function SingleServer:nextPlayerPlay()
 		local next_mid = player:getMid()
 		self.mRoomInfo:setNextPlayer(next_mid)
 	else
-		printLog("OWarn:O", "Error,Cannot Find Next Player !!!")
+		error("Error,SingleServer:~nextPlayerPlay() 之 Cannot Find Next Player !!!")
 	end
 end
 
 function SingleServer:gamePlayOver()
 	print("SingleServer:gamePlayOver()~~~~~~")
+	local gameOverList = {}
+	local gameOverPlayerList = {}
+	gameOverList.winnerMid =self.mRoomInfo:getWinner()
+ 
+	local maxPlayerNum = SingleMaxPlayerNum
+	for i = 1 , maxPlayerNum do 
+		local player = self.mRoomInfo:findPlayerByDirection( i )
+		if player and next(player) then
+			local playerInfo = {}
+			playerInfo.mid   = player:getMid()
+			playerInfo.nick  = player:getNick()
+			playerInfo.money = player:getMoney()
+			playerInfo.sex   = player:getSex()
+			playerInfo.seat  = player:getSeat()
+			gameOverPlayerList[i] = playerInfo
+		end
+	end
+	self.mRoomInfo:setGameOverInfo(gameOverList , gameOverPlayerList)
+
+	EventDispatcher.getInstance():dispatch( kServerPlayOverEv , mid)
 end
 -- ************************************LogicHelperFun*********************************************
 
@@ -229,6 +250,8 @@ function SingleServer:onOutCardEvent(mid)
 
 	local gameIsOver = (player and player:getPlayerCards().count == 0) or false;
 	if gameIsOver then
+		self.mRoomInfo:setWinner(mid)
+		self.mRoomInfo:setNextPlayer(0)
 		EventDispatcher.getInstance():dispatch(kServerPlayerOutCardsEv , mid);
 		self:gamePlayOver();
 	elseif mid ~= 0 then

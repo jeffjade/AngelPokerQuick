@@ -46,7 +46,7 @@ function RoomPlayer:setNick(nick)
 	self.mNick = nick
 end
 
-function RoomPlayer:getIcon()
+function RoomPlayer:getNick()
 	return self.mNick
 end
 

@@ -43,16 +43,14 @@ function GameAiPlayer:thinkHowGame()
 	else
 		outCards , betCards = self:outLargeCard(myCards);
 	end
-	print("GameAiPlayer:thinkHowGame()~~~~~~~")
+
 	if #outCards == 0 then 
 		print("GameAiPlayer:thinkHowGame()~~~~~~~ what???")
 	end
+	print("~~~~~~~~GameAiPlayer:ai out cards: ")
 	print_lua_table(outCards)
 
-	if outCards then
-		if #outCards == 0 then
-			local i = 0;
-		end
+	if outCards and next(outCards) then
 		self:setOutCards(#outCards, outType, outCards);
 
 		self.mMyCardsChanged = true;
@@ -76,8 +74,24 @@ function GameAiPlayer:outFirstCard(myCards)
 end
 
 -- 此处AI判断,得出最有优势的牌~出之;
-function GameAiPlayer:outLargeCard()
+function GameAiPlayer:outLargeCard(myCards)
+ 	-- Find Last BetCardsValue In MyCards( If Have Put True,Or Turn PlayCard)
+	local lastCards = self.mRoomInfo:getLastOutCards()
+	local lastBetCards = lastCards.betCards
+	local lastCardsValue = lastBetCards.cardValue
 
+	local tempCards = {}
+	for k , v in pairs(myCards) do
+		if v and lastCardsValue == v.cardValue then
+			table.insert(tempCards , v)
+		end
+	end
+
+	if next(tempCards) then
+		return tempCards , tempCards
+	else
+		return nil , nil
+	end
 end
 
 -- 出真牌(即out bet牌一致)
@@ -86,7 +100,7 @@ function GameAiPlayer:outBetTrueCard(Cards)
 	local trueCardsList = self:findTrueCardList(Cards)
 
 	-- 得到有效的真牌表(剔除空table)
-	for k , v in pairs(trueCardsList) do 
+	for k , v in pairs(trueCardsList) do
 		if v and type(v) and not next(v) then
 			table.remove(trueCardsList, k )
 			trueCardsList[k] = nil
