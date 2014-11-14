@@ -47,6 +47,7 @@ function GameAiPlayer:thinkHowGame()
 	if #outCards == 0 then 
 		print("GameAiPlayer:thinkHowGame()~~~~~~~ what???")
 	end
+	print("~~~~~~~~player mid is:"..self.mMid)
 	print("~~~~~~~~GameAiPlayer:ai out cards: ")
 	print_lua_table(outCards)
 
@@ -97,13 +98,13 @@ end
 -- 出真牌(即out bet牌一致)
 function GameAiPlayer:outBetTrueCard(Cards)
 	-- random from(1~4) to get the number true cards
-	local trueCardsList = self:findTrueCardList(Cards)
+	local trueCardsTempist = self:findTrueCardList(Cards)
+	local trueCardsList = {}
 
 	-- 得到有效的真牌表(剔除空table)
-	for k , v in pairs(trueCardsList) do
-		if v and type(v) and not next(v) then
-			table.remove(trueCardsList, k )
-			trueCardsList[k] = nil
+	for k , v in pairs(trueCardsTempist) do
+		if v and type(v) and next(v) then
+			table.insert(trueCardsList , v) 
 		end
 	end
 
