@@ -70,7 +70,7 @@ function GameAiPlayer:outFirstCard(myCards)
 	elseif betCardsFlag == 0 then 
 		outCards , betCards = self:outBetFalseCard(myCards)
 	end
-	return outCards , betCards
+	return outCards , betCards 
 end
 
 -- 此处AI判断,得出最有优势的牌~出之;

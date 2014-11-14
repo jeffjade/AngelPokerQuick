@@ -59,7 +59,7 @@ function MainScene:createScene()
             size = 48,
             color = cc.c3b(255,0,0)} ))
         :onButtonClicked(function(event)
-           local roomScene = require("app.scenes.RoomScene").new();
+           local roomScene = require(GameRoomPath.."roomScene").new();
            display.replaceScene(roomScene, "splitCols", 0.6, cc.TRANSITION_ORIENTATION_UP_OVER)
         end)
         :align(display.CENTER,display.cx,display.cy+200):addTo(self);

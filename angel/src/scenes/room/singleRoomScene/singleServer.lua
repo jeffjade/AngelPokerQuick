@@ -147,7 +147,7 @@ function SingleServer:dealCards()
 
 		player:sortPlayerCards()   -- 将玩家的牌排序
 
-		EventDispatcher.getInstance():dispatch( kServerDealCardsEv, player:getMid() );
+		EventDispatcher.getInstance():dispatch( kServerDealCardsEv, player:getMid() , playerCards);
 		print_lua_table(playerCards)
 	end
 
@@ -272,6 +272,7 @@ function SingleServer:onPlayNextEvent(mid)
 	else
 		-- do nothing
 	end
+
 
 	if mid ~= self.mRoomInfo:getMe():getMid() then
 		local player = self.mRoomInfo:findPlayerByMid(mid);

@@ -8,10 +8,10 @@
 
 local CardType = 
 {
-	Hei  = 1,
-	Hong = 2,
-	Mei  = 3,
-	Fang = 4,
+	Hei  = 0,
+	Hong = 1,
+	Mei  = 2,
+	Fang = 3,
 }
 
 local Card = class("Card")
