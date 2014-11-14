@@ -143,9 +143,9 @@ function SingleServer:dealCards()
 		local playerCards = {}
 		playerCards ,otherCards = CardUtil.get13cards(allCards)
 		local player = self:findPlayerByDirection(i)
-		player:setPlayerCards( #playerCards , playerCards )
 
-		player:sortPlayerCards()   -- 将玩家的牌排序
+		playerCards = CardUtil.sortCardsByValue( playerCards ) -- 对牌排序
+		player:setPlayerCards( #playerCards , playerCards )
 
 		EventDispatcher.getInstance():dispatch( kServerDealCardsEv, player:getMid() , playerCards);
 		print_lua_table(playerCards)
@@ -274,7 +274,7 @@ function SingleServer:onPlayNextEvent(mid)
 	end
 
 
-	if mid ~= self.mRoomInfo:getMe():getMid() then
+	if mid ~= PhpInfo:getMid() then
 		local player = self.mRoomInfo:findPlayerByMid(mid);
 		-- QueueUtils:getInstance():sychronizedDelayCommand(nil,function()
 		-- 		player:thinkHowGame()

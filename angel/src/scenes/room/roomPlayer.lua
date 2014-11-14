@@ -106,6 +106,7 @@ end
 
 function RoomPlayer:sortPlayerCards()
 	-- 对玩家的手牌进行排序
+	self.mPlayerCards = CardUtil.sortCardsByValue(self.mPlayerCards)
 end
 
 -- 设置玩家所出的牌[ _count张数; _betCards叫牌信息; _outCards出牌信息]
