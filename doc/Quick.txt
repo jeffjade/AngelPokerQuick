@@ -1,0 +1,251 @@
+10月28日  22:17
+邬涵卿  22:17:17
+1.创建简单LabelText:
+cc.ui.UILabel.new(
+    {
+        UILabelType = 1,     --1                               表示需要建立LabelBMFont对象
+                             --2 或者不传                表示需要建立LabelTTF对象
+
+        --[1] 表示位图字体创建文本显示对象
+        --参数如下：
+          text = 文本内容,
+          font = "",                 -- 位图名称
+          textAlign = align,   -- 对齐方式[默认无这项的话就是cc.TEXT_ALIGNMENT_LEFT]
+          maxLineW =  最大行宽  or 0,
+          offsetX = 图像的X偏移量 or 0,
+          offsetY = 图像的Y偏移量 or 0,
+          x           = 文字x坐标，
+          y           = 文字y坐标
+
+        -- [2] 表示普通文字
+        --参数如下：
+        text = 文本内容,
+        font = 字体名称 or Arial,
+        size  = 字体大小 or 24,
+        color = 字体颜色 or cc.c3b(255,255,255),
+        textAlign = 对齐方式 or cc.TEXT_ALIGNMENT_LEFT,
+        textValign = 对齐方式 or cc.VERTICAL_TEXT_ALIGNMENT_TOP,
+        x          = 文字x坐标,
+        y          = 文字y坐标,
+        dimensions = 文字显示对象的尺寸 or cc.size(0,0)
+    }
+):align(display.CENTER);--设置锚点位置，(具体按什么对齐,默认为左对齐)
+
+2.创建简单的Button:
+cc.ui.UIPushButton.new(
+    {normal=按钮不点击时的图片存放位置,
+    pressed=按钮按下时的图片存放位置,
+    disabled=按钮消失了},scale9=boolean(true表示支持缩放,false表示不支持缩放，为默认图片大小)
+    }
+)
+:setButtonSize(按钮宽度,按钮高度)(如果scale9设置的是false则不能使用该方法)
+:setButtonLabel(文字添加的时机(normal,pressed,disabled),cc.ui.UILabel)
+:onButtonClicked(回调函数function)
+:align(display.CENTER,display.cx,display.cy):设置锚点的位置坐标
+
+3.创建图片精灵:
+cc.ui.UIImage.new(图片路径,{scale9=boolean}[true表示可以自定义大小、false表示跟图片真实大小一致])
+:setLayoutSize(图片的宽度,图片的高度)[如scale9=false或者不设置，他会有图片被拉伸的效果]
+:align(display.CENTER,display.cx,display.cy):设置锚点位置的坐标
+
+4.创建普通颜色层:
+display.newColorLayer(cc.c4b(r, g,b,a));
+
+5.创建普通的线：
+display.newLine(
+    {{起始坐标点},{最终坐标点}},
+    { borderColor = cc.c4f(点的颜色),
+        borderWidth = 线的宽度
+    }
+);
+
+6.创建多边形：
+display.newPolygon(
+        {
+           {第一个点的坐标},
+            {第二个点的坐标},
+            {第三个点的坐标},
+            ...
+        }, 
+        {
+        borderColor = cc.c4f(点的颜色),
+        borderWidth=20
+        }
+);
+
+7.创建可变的UICheckButton,实现从一个状态到另一个状态:
+cc.ui.UICheckBoxButton.new({
+jeffyang(杨刚) 2014-11-13 20:21:28
+    off=off状态下的图片,
+    off_pressed=off状态被点击后的图片,
+    off_disabled=off状态不可用的图片,
+    on = on状态下的图片,
+    on_pressed = on状态被点击后的图片,
+    on_disabled = on状态下不可用的图片
+})
+邬涵卿  22:17:38
+:setButtonLabel(button中间的文字)
+:setButtonLabelOffset(文字标签的偏移量)
+:setButtonLabelAlignment(文字标签的对齐)
+:onButtonStateChanged(function(event)
+    button状态被改变时候调用的方法
+end)
+:setButtonSelected(boolean(是否选中状态))
+:align(display.xxx(对齐方式),横坐标,纵坐标);
+
+8.创建单选框按钮组:
+local group = cc.ui.UICheckBoxButtonGroup.new(direction[display.TOP_TO_BOTTOM/display.BOTTOM_TO_TOP](方向))
+:addButton(cc.ui.UICheckBoxButton1)
+:addButton(cc.ui.UICheckBoxButton2)
+:...
+:setButtonLayoutMargin(每个button间的空隙[上、右、下、左])
+:onButtonSelectChanged(function(event)
+    event.target
+    event.selected
+    event.last
+    button状态改变时候的使用
+end)
+:align(display.CENTER,锚点位置);
+
+group:getButtonAtIndex(数组下标):得到对应的按钮
+group:getButtonsCount():得到对应的按钮个数
+group:removeButtonAtIndex(数组下标):移除对应的按钮
+
+9.创建Slider滑动条:
+cc.ui.UISlider.new({
+    滑动方向(display.LEFT_TO_RIGHT、display.RIGHT_TO_LEFT、display.TOP_TO_BOTTOM,display.BOTTOM_TO_TOP,{bar=滑动图片,button=背景图片},{scale9=是否可以缩放,min=最小值,max=最大值,touchInButton 是否只有出没在滑块上时才有效，默认为真}
+:onSliderValueChanged(function(event)
+    --进度条改变的方法
+    event.value(进度值)
+end)
+:setSliderSize(滑动条的宽度，滑动条的高度)
+:setSliderValue(滑动条的值)
+:align(display.CENTER,坐标):设置锚点坐标
+:setSliderButtonRotation(滑动控件的旋转度)
+
+--只罗列常用方法,其他方法可参照framework里的ui
+
+10.简单ListView的创建
+self.listView=cc.ui.ListView.new{
+    bg="ListView的背景图片",
+    bgScale9=背景图是否可缩放,
+    viewRect=cc.rect(列表控件显示区域),
+    direction=cc.ui.UIScrollView.DIRECTION_VERTICAL/cc.ui.UIScrollView.DIRECTION_HORIZONTAL/cc.ui.UISrollView.DIRECTION_BOTH,
+    scrollbaringV=垂直方向的滚动条图片,
+    scrollbarImgH=水平方向的滚动条图片,
+    bgStartColor=渐变背景色开始色,nil表示无背景色
+    bgEndColor=渐变背景结束色,niil表示无背景色}
+:onTouch(hander(self,触摸事件));
+};
+local item = self.listView:newItem();
+local content = {};
+content[content+1] = cc.ui.UILabel,cc.ui.UIPushButton;
+item:setItemSize(每一项宽度,每一项高度);
+for i=1,#content do 
+    item:addContent(content[i]);    
+end
+item:setBg(每一项背景);
+
+--加载列表
+self.listView.reload();
+
+11.创建简单可拖动的ScrollView
+cc.ui.UIScrollView.new({
+    direction = UIScrollView.DIRECTION_BOTH,（默认都可以滚动）-- UIScrollView.DIRECTION_VERTICAL 水平滚动  --UIScrollView.DIRECTION_HORIZONTAL (垂直滚动)
+    viewRect = cc.rect(列表控件的显示区域),
+    scrollbarImgH=水平方向的滚动条,
+    scrollbarImgV = 垂直方向的滚动条,
+    bgColor =背景色,nil为无背景色,
+    bgStartColor=渐变背景开始色 ,nil表示无背景色,
+    bgEndColor = 渐变背景结束色,nil表示无背景色,
+    bg=背景图片,
+    bgScale9=boolean(背景图片是否可缩放),
+    capInsets=cc.rect(缩放区域)
+}):onScroll(handler(响应滑动的事件对象，响应滑动事件的方法)
+:setDirection(设置滑动方向)
+;
+
+12.创建简单可自由滑动的图片
+local sp3 = display.newScale9Sprite(图片名称);
+sp3:setContentSize(设置宽度高度);
+sp3.pos(显示位置);
+
+cc(sp3):addComponent("components.ui.DraggaleProtocol")
+:exportMethods()
+:setDraggableEnable(true);
+
+13.创建最简单的页面控件PageView
+self.pgView = cc.ui.UIPageView.new({
+    column = 每一页的列数，默认为1,
+    row = 每一页的行数,默认为1,
+    columnSpace=列之间的间隙,默认为0,
+    rowSpace = 行之间的间隙,默认为0,
+    padding = {left=,right=,top=,bottom=},
+    bCirc = 页面是否循环,默认为false
+})
+:ouTouch(handler(响应触摸的对象,响应的方法))
+;
+
+local item = self.pgView:newItem();
+local content = cc.ui.xxx;
+item:addChild(content);
+self.pgView:addItem(item);
+
+self.pgView:reload();
+
+
+14.创建秒数级延时动画（几秒钟后响应该函数):
+self:performWithDelay(function()   end,秒数);
+
+15.切换场景：
+display.replaceScene(场景名字,过度效果,过渡时间(秒),附加参数);过渡效果和过渡参数罗列:
+crossFade,无参数:淡出当前场景的同时淡入下一个场景
+fade,颜色参数(cc.c3b):淡出当前场景到指定颜色
+fadeBL,无参数:从左下角开始淡出场景
+fadeDown,无参数:从底部开始淡出场景
+fadeTR,无参数:从右上角开始淡出场景
+fadeUp,无参数:从顶部开始淡出场景
+flipAngular,可选参数:当前场景倾斜后翻转成下一个场景。默认从左边开始反转。主要有:
+    cc.TRANSITION_ORIENTATION_LEFT_OVER 
+    cc.TRANSITION_ORIENTATION_RIGHT_OVER
+    cc.TRANSITION_ORIENTATION_UP_OVER
+    cc.TRANSITION_ORIENTATION_DOWN_OVER
+flipX,可选参数:水平翻转 。默认从左往右(同上参数)
+flipY,可选参数:垂直翻转。默认从上往下(同上参数)
+zoomFlipAngular,可选参数:倾斜翻转的同时放大(同上参数)
+zoomFlipX,可选参数:水平翻转的同时放大(同上参数)
+zoomFlipY,可选参数:垂直翻转的同时放大(同上参数)
+jumpZoom,无参数:跳跃放大切换场景
+slideInB,无参数:新场景从底部进入，现有场景同时从顶部退出
+slideInL,无参数:新场景从左侧进入，现有场景同时从右侧退出
+slideInR,无参数:新场景从右侧进入，现有场景同时从左侧退出
+slideInT,无参数:新场景从顶部进入，现有场景同时从底部退出
+pageTurn,可选参数:翻页效果，默认为true表示从左向右翻页
+rotoZoom,无参数:旋转放大效果
+shrinkGrow,无参数:收缩交叉切换效果
+moveInB,无参数:新场景从底部进入，直接覆盖当前场景
+moveInL,无参数:新场景从左侧进入，直接覆盖当前场景
+moveInR,无参数:新场景从右侧进入，直接覆盖当前场景
+moveInT,无参数:新场景从顶部进入，直接覆盖当前场景
+splitCols,无参数:分成多列切入新场景
+splitRows,无参数:分成多行切入新场景(百叶窗效果)
+turnOffTiles,无参数:当前场景分成多个块，逐渐替换为新的场景
+
+附录二、常量值
+ 
+display.sizeInPixels.width,display.sizeInPixels.height                           -- 屏幕像素分辨率
+display.widthInPixels,display.heightInPixels                                         -- 屏幕像素分辨率
+display.contentScaleFactor                                                                    -- 内容缩放因子
+display.size.widt
+jeffyang(杨刚) 2014-11-13 20:21:29
+h(display.width),display.size.height(display.height)  -- 屏幕的设计分辨率
+display.cx,display.cy                                                                               -- 屏幕中央的x坐标、y坐标
+display.left,display.top,display.right,display.bottom                            -- 屏幕四边的坐标
+display.c_left,display.c_top,display.c_right,display.c_bottom               -- 当父对象在屏幕中央时，屏幕四边的坐标
+display.COLOR_WHITE,display.COLOR_BLACK                                     -- cc.c3b(255,255,255),cc.c3b(0,0,0)
+display.FIXED_SIZE         
+jeffyang(杨刚) 2014-11-13 20:21:29
+            -- 充满整个屏幕
+display.AUTO_SIZE                     -- 局部填充
+--对齐方式有下列这些，见名知意
+display.CENTER、display.TOP_LEFT、 display.TOP_CENTER、display.TOP_RIGHT、display.CENTER_LEFT、display.CENTER_RIGHT、display.RIGHT_CENTER、display.BOTTOM_LEFT 、display.BOTTOM_RIGHT 、display.BOTTOM_CENTER

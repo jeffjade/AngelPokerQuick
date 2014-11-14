@@ -10,16 +10,40 @@ function RoomScene:ctor()
     self:addPersonSecond()
     self:addPersonThird()
     self:addSelf()
-
+--debug -------------
     local tCards = {}
     for i = 1, 49 do
         local card = {}
         card.cardValue = 1
-        card.cardType = 2
+        card.cardType = 1
         tCards[#tCards + 1] = card
     end
+--debug -------------
+    self:loadCard(tCards)
+    self:createOutCardButton()
+end
 
---Debug 加载牌
+--创建选牌对话框
+function RoomScene:showSelectDialog()
+    self.m_dlgSelectCard = require(GameRoomPath .. "selectCardDialog").new()
+    self:addChild(self.m_dlgSelectCard)
+end
+
+--创造确定出牌按钮
+function RoomScene:createOutCardButton()
+    self.m_btnOutCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx, display.cy - 80)
+    self.m_btnOutCard:onButtonClicked(function()
+        self:showSelectDialog()
+    end)
+    self:addChild(self.m_btnOutCard)
+
+    local imgBtnInnerCircle = cc.ui.UIImage.new("btnOutCardInnerCircle.png")
+    imgBtnInnerCircle:setPosition(-32, -32)
+    self.m_btnOutCard:addChild(imgBtnInnerCircle)
+end
+
+--加载牌面
+function RoomScene:loadCard(tCards)
     local cardui = require(GameRoomPath .. "roomMyCardUI").new()
     cardui:createCards(tCards)
     cardui:placeCard()
