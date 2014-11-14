@@ -1,6 +1,5 @@
 -- Date : 2014-10-261 20:37
 -- Desc : ToolUtil 小工具
-
 ToolUtil = {};
 
 -- 将long转换成:xx年xx月xx日xx时xx分xx秒格式
@@ -362,3 +361,243 @@ function ToolUtil.concatString(...)
 	end
 	return str
 end
+
+--组合数算法
+--@param array 数组
+--@param n 	   取几项
+--return newArray 从数组array中取n项出来的方法
+--desc  : 1).将第一个值取到 -->根据array的长度，把前n项赋值为1标识选中项，其他项为0标为未选中项 作为第一条记录封装起来
+--		  2).根据第一个值，每次从头查找整个数组中1,0的字样，有就把它赋值为0,1,并计算这项之前的1的个数，把其放在最前面
+--			 比如：1,1,1,0,0  =>1,1,0,1,0 => 1,0,1,1,0 =>0,1,1,1,0 =>1,1,0,0,1 (这步要理解)，生成的数即可放入数组中封装起来
+--		  3).根据1)、2)步封装的数组，将元数组是1的位取出来即为所求
+function ToolUtil.combination(array,n)
+	if n>#array then 
+		return;
+	end
+	local newArray = {};
+	--初始化数组,将其需要选中的第一项赋值为1，未选中的赋值为0
+	local function initCombition(array,n)
+		local initArray = {};
+		for i=1,#array do
+			initArray[i] = 0;
+		end
+		for i=1,n do 
+			initArray[i] = 1;
+		end
+		return initArray;
+	end
+
+	--判定是否已经到了最后一个数
+	local function isEnding(array,n)
+		local flag = true;
+		for i=#array,#array-n+1,-1 do 
+			if array[i] ~= 1 then 
+				return false;
+			end
+		end
+		return flag;
+	end
+
+	--组合数核心算法
+	local function combination(array,n)
+		local combinationArray = {};
+		repeat 
+			local pos = 0;
+			local sumN = 0;
+
+			for i=1,#array-1 do 
+				if array[i] == 1 and array[i+1] == 0 then 
+					array[i] = 0;
+					array[i+1] = 1;
+					pos = i;
+					break;
+				end
+			end
+
+			for i=1,pos do
+				if array[i] == 1 then 
+					sumN = sumN + 1;
+				end
+			end
+
+			for i=1,sumN do 
+				array[i] = 1;
+			end
+
+			for i=sumN+1,pos-1 do 
+				array[i] = 0;
+			end
+
+			combinationArray[#combinationArray+1] = clone(array);
+		until isEnding(array,n)
+		return combinationArray;
+	end
+
+	--把所1的组合从原数组中返回
+	local function allCombineWithOriginArray(originArray,containOneArray) 
+		local newArray = {};
+		for i=1,#containOneArray do 
+			local array = {};
+			for j=1,#containOneArray[i] do
+				if containOneArray[i][j] == 1 then 
+					table.insert(array,originArray[j]);
+				end
+			end
+			newArray[#newArray+1] = clone(array);
+		end
+		return newArray;
+	end
+
+	local firstArray = initCombition(array,n);
+	table.insert(newArray,firstArray);
+	local secondArray = clone(firstArray);
+	secondArray = combination(secondArray,n);
+	for i=1,#secondArray do 
+		table.insert(newArray,secondArray[i]);
+	end
+
+	return allCombineWithOriginArray(array,newArray);
+end
+
+function clone(object)
+    local lookup_table = {}
+    local function _copy(object)
+        if type(object) ~= "table" then
+            return object
+        elseif lookup_table[object] then
+            return lookup_table[object]
+        end
+        local new_table = {}
+        lookup_table[object] = new_table
+        for key, value in pairs(object) do
+            new_table[_copy(key)] = _copy(value)
+        end
+        return setmetatable(new_table, getmetatable(object))
+    end
+    return _copy(object)
+end
+
+function compare2Table(tableA , tableB)
+	if type(tableA) ~= "table" then
+		if tableA ~= tableB then 
+			return false
+		end
+	else 
+		for k , v in pairs(tableA) do 
+			if type(v) == "table" then
+				compare2Table(v , tableB[k])
+			elseif v ~= tableB[k] then
+				return false
+			end 
+  		end
+  	end
+  	return true
+end
+
+local print = print
+local tconcat = table.concat
+local tinsert = table.insert
+local srep = string.rep
+local type = type
+local pairs = pairs
+local tostring = tostring
+local next = next
+
+function print_lua_table (lua_table, indent)
+    if not lua_table or type(lua_table) ~= "table" then
+    	print("Warn : This table or sunTable not a true table")
+        return;
+    end
+
+    if not next(lua_table) then
+    	print("This table is kong table")
+    end 
+
+    indent = indent or 0
+    for k, v in pairs(lua_table) do
+        if type(k) == "string" then
+            k = string.format("%q", k)
+        end
+        local szSuffix = ""
+        if type(v) == "table" then
+            szSuffix = "{"
+        end
+        local szPrefix = string.rep("    ", indent)
+        formatting = szPrefix.."["..k.."]".." = "..szSuffix
+        if type(v) == "table" then
+            print(formatting)
+            print_lua_table(v, indent + 1)
+            print(szPrefix.."},")
+        else
+            local szValue = ""
+            if type(v) == "string" then
+                szValue = string.format("%q", v)
+            else
+                szValue = tostring(v)
+            end
+            print(formatting..szValue..",")
+        end
+    end
+end
+
+function removeRetable(retable , sortfunc)
+    local result = {}
+    local check = {}
+    local isRetab
+    for i = 1 , #retable do 
+        check[i] = {}
+    end
+
+    for i = 1 , #retable do
+        for j = i+1 , #retable do 
+            isRetab = compare2Table(retable[i] ,retable[j])
+            if isRetab then
+                table.insert(check[i] , j)
+                check[j] = {}
+            end
+        end
+    end
+
+    for i = 1 , #retable do
+        if not next(check[i]) then 
+            result[#result+1] = retable[i]
+        end
+    end
+    return result
+end
+
+function cutoutCommonWith2Table(tableA , tableB)
+    local result = {}
+    local flagList = {}
+    for k , v in pairs(tableA) do 
+        flagList[k] = true
+        for k2 , v2 in pairs(tableB) do 
+            if v == v2 then 
+                flagList[k] = false
+                break
+            end
+        end 
+    end
+
+    for k , v in pairs(tableA) do 
+        if flagList[k] then
+            table.insert(result , v)
+        end
+    end 
+    return result
+end
+
+local co = coroutine.create(function()
+	local a = {2,2,2,4,5}
+	local array = ToolUtil.combination(a,2);
+	
+	local aarray = removeRetable(array);
+	cutoutCommonWith2Table(aarray,{2,2})
+	print_lua_table(aarray)
+	-- for i=1,#array do
+	-- 	print(unpack(array[i]));
+	-- end
+end)
+
+coroutine.resume(co)
+
