@@ -27,12 +27,30 @@ function RoomScene:init()
         tCards[#tCards + 1] = card
     end
 	self:showMyCards(tCards)
+    self:createOutCardButton()
 end
 
 function RoomScene:onEnter()
 end
 
 function RoomScene:onExit() 
+end
+
+function RoomScene:showSelectDialog()
+    self.m_dlgSelectCard = require(GameRoomPath .. "roomDialog/selectCardDialog").new()
+    self:addChild(self.m_dlgSelectCard)
+end
+
+function RoomScene:createOutCardButton()
+    self.m_btnOutCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx, display.cy - 80)
+    self.m_btnOutCard:onButtonClicked(function()
+        self:showSelectDialog()
+    end)
+    self:addChild(self.m_btnOutCard)
+
+    local imgBtnInnerCircle = cc.ui.UIImage.new("btnOutCardInnerCircle.png")
+    imgBtnInnerCircle:setPosition(-32, -32)
+    self.m_btnOutCard:addChild(imgBtnInnerCircle)
 end
 
 function RoomScene:showMyCards(tCards)

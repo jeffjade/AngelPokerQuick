@@ -32,7 +32,6 @@ end
 
 function RoomMyCardUI:createCards(tCards)
 	for k, v in ipairs(tCards) do
-print("********************************************************" .. v.cardValue)
 		local card = require(GameRoomPath .. "card").new(v.cardValue, v.cardType):createCard()
 		self.m_cards[#self.m_cards + 1] = card
 		self.m_numCards = k
