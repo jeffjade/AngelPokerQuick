@@ -4,7 +4,7 @@
     <dict>
         <key>frames</key>
         <dict>
-            <key>h1.png</key>
+            <key>h10.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{846,1268},{420,565}}</string>
@@ -17,7 +17,7 @@
                 <key>sourceSize</key>
                 <string>{420,565}</string>
             </dict>
-            <key>h10.png</key>
+            <key>h11.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{1413,1136},{420,565}}</string>
@@ -30,7 +30,7 @@
                 <key>sourceSize</key>
                 <string>{420,565}</string>
             </dict>
-            <key>h11.png</key>
+            <key>h12.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{846,846},{420,565}}</string>
@@ -43,7 +43,7 @@
                 <key>sourceSize</key>
                 <string>{420,565}</string>
             </dict>
-            <key>h12.png</key>
+            <key>h13.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{424,1136},{420,565}}</string>
@@ -56,7 +56,7 @@
                 <key>sourceSize</key>
                 <string>{420,565}</string>
             </dict>
-            <key>h13.png</key>
+            <key>h14.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{1558,569},{420,565}}</string>
@@ -69,7 +69,7 @@
                 <key>sourceSize</key>
                 <string>{420,565}</string>
             </dict>
-            <key>h2.png</key>
+            <key>h15.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{991,424},{420,565}}</string>
@@ -183,7 +183,7 @@
             <key>size</key>
             <string>{2048,2048}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:ea2d11d32e53055c93f0f76438ee4477$</string>
+            <string>$TexturePacker:SmartUpdate:47bb074f75bfd4056054958de0e83ccd$</string>
             <key>textureFileName</key>
             <string>card_h.png</string>
         </dict>

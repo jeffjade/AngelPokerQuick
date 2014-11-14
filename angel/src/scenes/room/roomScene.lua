@@ -22,8 +22,8 @@ function RoomScene:init()
 	local tCards = {}
     for i = 1, 49 do
         local card = {}
-        card.cardValue = 1
-        card.cardType = 2
+        card.cardValue = 15
+        card.cardType = 3
         tCards[#tCards + 1] = card
     end
 	self:showMyCards(tCards)
