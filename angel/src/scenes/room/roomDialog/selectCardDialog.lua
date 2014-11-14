@@ -4,7 +4,14 @@ end)
 
 SelectDialogParams =
 {
+	BGMaskWidth = 800
+	BGMaskHeight = 400
 
+	BGOpacity = 125
+	BGAnchorX = 0.5
+	BGAnchorY = 0.5
+
+	CardUpperY = display.cy + 80
 }
 
 SelectDialogCardParams = 
@@ -16,9 +23,9 @@ function SelectCardDialog:createMask()
 	local imgMask = cc.ui.UIImage.new("mask.png")
 
 	imgMask:setPosition(display.cx, display.cy + 80)
-	imgMask:setOpacity(125)
-	imgMask:setAnchorPoint(0.5, 0.5)
-	imgMask:setLayoutSize(800, 400)
+	imgMask:setOpacity(SelectDialogParams.BGOpacity)
+	imgMask:setAnchorPoint(SelectDialogParams.BGAnchorX, SelectDialogParams.BGAnchorY)
+	imgMask:setLayoutSize(SelectDialogParams.BGMaskWidth, SelectDialogParams.BGMaskHeight)
 
 	self:addChild(imgMask)
 end
@@ -29,6 +36,7 @@ function SelectCardDialog:ctor()
 	self:init()
 	self:createMask()
 	self:createCards()
+	self:placeUpperCards()
 --debug---------------
 	-- self:addChild(self.m_cards[1])
 --debug---------------
@@ -36,10 +44,13 @@ end
 
 --排列上层牌 A ~ 8
 function SelectCardDialog:placeUpperCards()
-	local gap = (800 - 1)
+	local gap = (SelectDialogParams.BGMaskWidth - SelectDialogCardParams.Width * 7) / 8
+	local startPointX = display.cx - SelectDialogParams.BGMaskWidth/2 + gap
 
 	for i = 1, 7 do
-		--self.m_cards[i]:pos()
+		self.m_cards[i]:pos(
+			startPointX + (i - 1) * (SelectDialogCardParams.Width + gap)
+			, SelectDialogParams.CardUpperY)
 	end
 end
 
