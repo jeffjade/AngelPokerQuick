@@ -191,6 +191,21 @@ CardUtil.sortCardsByValue = function(cards)
 	return cards
 end
 
+--[[@Param  : outCards[所出牌之表],betCards[所叫牌之表]
+    @return : true(两个表相同)/false(两表不同)
+    @Desc   : 验证Player所打之牌是否为真(出的牌和叫的牌一致)]]
+CardUtil.judgePlayIsTrue = function(outCards, betCards)
+	for k , v in pairs(outCards) do
+		if type(v) ~= "table" or not v.cardByte or 
+		   type(betCards[k]) ~= "table" or not betCards[k].cardByte then 
+		   error("need judge cards are not legal !")
+		elseif v.cardByte ~= betCards[k].cardByte then 
+			return false
+		end
+	end
+	return true
+end
+
 local allCards = CardUtil.getAllCardsWithNoKings()
 local shuffleCards = CardUtil.shuffleCards(allCards)
 local playerCards , otherCards = CardUtil.get13cards(allCards)
@@ -199,10 +214,7 @@ playerCards = CardUtil.sortCardsByValue(playerCards)
 -- print("===================")
 -- print_lua_table(otherCards)
 
-
-
-
-
+--[[
 function randomInt(max_num, min_num)
 	local min_num = min_num or 0;
 	local num = max_num - min_num;
@@ -213,10 +225,11 @@ function outBetTrueCard(Cards)
 	-- random from(1~4) to get the number true cards
 	local trueCardsList = findTrueCardList(Cards)
 
-	-- 得到有效的真牌表(剔除空table)
+	-- 得到3有效的真牌表(剔除空table)
 	for k , v in pairs(trueCardsList) do 
-		if v and type(v) and not next(v) then
+		if v and type(v) == "table" and not next(v) then
 			table.remove(trueCardsList, k )
+			trueCardsList[k] = nil
 		end
 	end
 
@@ -226,6 +239,7 @@ function outBetTrueCard(Cards)
 
 	-- random from(1~num);得到真牌组内出哪张真牌
 	local num = randomInt(#tempCards or 1, 1)
+	print_lua_table(trueCardsList)
 	local trueCards = tempCards[num]
 
 	local betCards ={}
@@ -272,4 +286,4 @@ function findTrueCardList(Cards)
 	return trueCardsList
 end
 
--- outBetTrueCard(playerCards)
+outBetTrueCard(playerCards)]]

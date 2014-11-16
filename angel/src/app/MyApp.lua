@@ -15,11 +15,6 @@ GameRoomPath = "scenes/room/"
 function MyApp:run()
     cc.FileUtils:getInstance():addSearchPath("res/")
     self:enterScene("MainScene")
-
-    print_lua_table({"adsf","asdf"})
-    -- require("scenes.room").new():run()
-    -- local singleScene = require(GameRoomPath.."singleRoomScene/singleScene")
-    -- display.replaceScene(singleScene)
 end
 
 return MyApp

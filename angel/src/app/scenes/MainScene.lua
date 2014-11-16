@@ -4,7 +4,7 @@ local MainScene = class("MainScene", function()
 end)
 
 function MainScene:ctor()
-	cc.ui.UIImage.new("LoginBg.png")
+	cc.ui.UIImage.new("login/LoginBg.png")
 		:align(display.CENTER,display.cx , display.cy)
 		:addTo(self)
 
@@ -22,16 +22,9 @@ end
 
 function MainScene:createScene()
 	print("MainScene createScene-----------------------------");
-	printInfo("MainScene createScene-----------------------------")
 	printLog("WARN", "Network connection lost at %d", os.time())
 	
-	
-	-- local scene = display.newScene(name)
-	-- local node = singleScene.new(name)
-	-- scene:addChild(node)
-	-- return scene
 	-- display.newColorLayer(cc.c4b(255, 0, 0,255)):addTo(self);
-
     display.newLine(
     {
         {display.left,display.top},{display.right,display.bottom}
@@ -66,7 +59,7 @@ function MainScene:createScene()
             size = 48,
             color = cc.c3b(255,0,0)} ))
         :onButtonClicked(function(event)
-           local roomScene = require("app.scenes.RoomScene").new();
+           local roomScene = require(GameRoomPath.."roomScene").new();
            display.replaceScene(roomScene, "splitCols", 0.6, cc.TRANSITION_ORIENTATION_UP_OVER)
         end)
         :align(display.CENTER,display.cx,display.cy+200):addTo(self);
@@ -88,6 +81,5 @@ function MainScene:createScene()
 	end)
 	:addTo(self)
 end
-
 
 return MainScene

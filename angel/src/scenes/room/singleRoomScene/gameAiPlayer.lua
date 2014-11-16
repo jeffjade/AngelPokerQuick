@@ -2,15 +2,26 @@
 -- Date : 2014.10.28   19:45
 -- Auth : JeffYang
 
-local roomPlayer = require(GameRoomPath.."roomPlayer")
-GameAiPlayer = class("GameAiPlayer" , roomPlayer)
+local SinglePlayer = require(GameRoomPath.."singleRoomScene/singlePlayer")
+GameAiPlayer = class("GameAiPlayer" , SinglePlayer)
 
 function GameAiPlayer:ctor()
-
+	self.mRoomInfo = require(GameRoomPath.."roomCache").new()
+	self:registerEvent()
 end
 
 function GameAiPlayer:dtor()
+	self:unregisterEvent()
+end
 
+function GameAiPlayer:registerEvent()
+	self.mEventTable = {
+		[kServerPlayerOutCardsEv] 		= self.onPlayerOutCardEvent;
+	}
+
+	for k,v in pairs(self.mEventTable) do
+		EventDispatcher.getInstance():register(k, self ,v);
+	end
 end
 
 function GameAiPlayer:setMoney()
@@ -18,7 +29,7 @@ function GameAiPlayer:setMoney()
 end
 
 function GameAiPlayer:getRoomInfo()
-	self.mRoomInfo = require(GameRoomPath.."roomCache").new()
+	return self.mRoomInfo
 end
 
 function GameAiPlayer:thinkHowGame()
@@ -26,53 +37,74 @@ function GameAiPlayer:thinkHowGame()
 	local outCards;
 	local betCards;
 
-	if lastMid == 0 or lastMid == self.meMid then
-		outCards , betCards = self:outFirstCard();
+	local myCards = self:getPlayerCards().cards;
+	if lastMid == 0 or lastMid == self.mMid then
+		outCards , betCards = self:outFirstCard(myCards);
 	else
-		outCards , betCards = self:outLargeCard();
+		outCards , betCards = self:outLargeCard(myCards);
 	end
 
-	if outCards then
-		if #outCards == 0 then
-			local i = 0;
-		end
-		-- RoomCardTools.print_cards("out cards: " .. outType .. " ", outCards);
+	if #outCards == 0 then 
+		print("GameAiPlayer:thinkHowGame()~~~~~~~ what???")
+	end
+	print("~~~~~~~~player mid is:"..self.mMid)
+	print("~~~~~~~~GameAiPlayer:ai out cards: ")
+	print_lua_table(outCards)
+
+	if outCards and next(outCards) then
 		self:setOutCards(#outCards, outType, outCards);
 
 		self.mMyCardsChanged = true;
-		self:outCard();  -- 出牌
+		self:outPlayCard();  -- 出牌
 	else
-		self:turnCard(); -- 翻牌
+		self:turnPlayCard(); -- 翻牌
 	end
 end
 
 -- 此处为第一首出牌(经过AI得之)
-function GameAiPlayer:outFirstCard()
+function GameAiPlayer:outFirstCard(myCards)
 	local outCards , betCards
 	-- first out card: random from true(1) and false(0)
-	local betCardsFlag = ToolUtil.ToolUtil.randomInt(1 , 0)
-	if betCardsFlag == 1 then 
-		outCards , betCards = self:outBetTrueCard()
+	local betCardsFlag = ToolUtil.randomInt(1 , 1)
+	if betCardsFlag == 1 then
+		outCards , betCards = self:outBetTrueCard(myCards)
 	elseif betCardsFlag == 0 then 
-		outCards , betCards = self:outBetFalseCard()
+		outCards , betCards = self:outBetFalseCard(myCards)
 	end
-	return outCards , betCards
+	return outCards , betCards 
 end
 
 -- 此处AI判断,得出最有优势的牌~出之;
-function GameAiPlayer:outLargeCard()
+function GameAiPlayer:outLargeCard(myCards)
+ 	-- Find Last BetCardsValue In MyCards( If Have Put True,Or Turn PlayCard)
+	local lastCards = self.mRoomInfo:getLastOutCards()
+	local lastBetCards = lastCards.betCards
+	local lastCardsValue = lastBetCards.cardValue
 
+	local tempCards = {}
+	for k , v in pairs(myCards) do
+		if v and lastCardsValue == v.cardValue then
+			table.insert(tempCards , v)
+		end
+	end
+
+	if next(tempCards) then
+		return tempCards , tempCards
+	else
+		return nil , nil
+	end
 end
 
 -- 出真牌(即out bet牌一致)
 function GameAiPlayer:outBetTrueCard(Cards)
 	-- random from(1~4) to get the number true cards
-	local trueCardsList = findTrueCardList(Cards)
+	local trueCardsTempist = self:findTrueCardList(Cards)
+	local trueCardsList = {}
 
 	-- 得到有效的真牌表(剔除空table)
-	for k , v in pairs(trueCardsList) do 
-		if v and type(v) and not next(v) then
-			table.remove(trueCardsList, k )
+	for k , v in pairs(trueCardsTempist) do
+		if v and type(v) and next(v) then
+			table.insert(trueCardsList , v) 
 		end
 	end
 
@@ -88,7 +120,7 @@ function GameAiPlayer:outBetTrueCard(Cards)
 	betCards.num = 	cardsNum
 	betCards.value = trueCards.cardValue;
 
-	print_lua_table(trueCards)
+	print_lua_table(trueCards)---------@@@
 	return trueCards , betCards
 end
 
@@ -129,7 +161,7 @@ end
 
 -- 出假牌(即out bet牌 不一致)
 function GameAiPlayer:outBetFalseCard()
-	
+	print("GameAiPlayer:outBetFalseCard()~~~~~~")
 end
 
 
@@ -137,12 +169,21 @@ function GameAiPlayer:sortCards(cards)
 
 end
 
-function GameAiPlayer:outCard(cards, count)
-	self:dispathEvent({name = "SingleOutCardsEvent"})
+function GameAiPlayer:outPlayCard()
+	EventDispatcher.getInstance():dispatch(kSingleOutCardEv , self.mMid);
 end
 
-function GameAiPlayer:turnCard()
-	
+function GameAiPlayer:turnPlayCard()
+	EventDispatcher.getInstance():dispatch(kSingleTurnCardEv , self.mMid);
 end
+
+-- -----------------------------onEventCallBack-----------------------------
+function GameAiPlayer:onPlayerOutCardEvent(mid)
+	-- 播放robot的聊天动画;
+	if mid ~= self.mMid then
+
+	end
+end
+-- -----------------------------onEventCallBack-----------------------------
 
 return GameAiPlayer
