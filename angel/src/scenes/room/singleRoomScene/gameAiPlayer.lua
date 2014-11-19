@@ -5,8 +5,8 @@
 local SinglePlayer = require(GameRoomPath.."singleRoomScene/singlePlayer")
 GameAiPlayer = class("GameAiPlayer" , SinglePlayer)
 
-function GameAiPlayer:ctor()
-	self.mRoomInfo = require(GameRoomPath.."roomCache").new()
+function GameAiPlayer:ctor(roomInfo)
+	self.mRoomInfo = roomInfo
 	self:registerEvent()
 end
 
@@ -32,8 +32,10 @@ function GameAiPlayer:getRoomInfo()
 	return self.mRoomInfo
 end
 
-function GameAiPlayer:thinkHowGame()
+function GameAiPlayer:thinkHowGame(lastMid)
 	local lastMid = self.mRoomInfo:getLastPlayer();
+	print("~~~~~~~~GameAiPlayer mid is:"..self.mMid)
+	print("~~~~~~~~GameAiPlayer:ai out cards:lastMid = "..lastMid)
 	local outCards;
 	local betCards;
 
@@ -44,15 +46,10 @@ function GameAiPlayer:thinkHowGame()
 		outCards , betCards = self:outLargeCard(myCards);
 	end
 
-	if #outCards == 0 then 
-		print("GameAiPlayer:thinkHowGame()~~~~~~~ what???")
-	end
-	print("~~~~~~~~player mid is:"..self.mMid)
-	print("~~~~~~~~GameAiPlayer:ai out cards: ")
-	print_lua_table(outCards)
+	-- print_lua_table(outCards)
 
 	if outCards and next(outCards) then
-		self:setOutCards(#outCards, outType, outCards);
+		self:setOutCards(#outCards, betCards, outCards);
 
 		self.mMyCardsChanged = true;
 		self:outPlayCard();  -- 出牌
@@ -71,13 +68,16 @@ function GameAiPlayer:outFirstCard(myCards)
 	elseif betCardsFlag == 0 then 
 		outCards , betCards = self:outBetFalseCard(myCards)
 	end
-	return outCards , betCards 
+	return outCards , betCards
 end
 
 -- 此处AI判断,得出最有优势的牌~出之;
 function GameAiPlayer:outLargeCard(myCards)
  	-- Find Last BetCardsValue In MyCards( If Have Put True,Or Turn PlayCard)
 	local lastCards = self.mRoomInfo:getLastOutCards()
+	print("gameAiPlayer lastCards is:")
+	print_lua_table(lastCards)
+
 	local lastBetCards = lastCards.betCards
 	local lastCardsValue = lastBetCards.cardValue
 
@@ -118,9 +118,10 @@ function GameAiPlayer:outBetTrueCard(Cards)
 
 	local betCards ={}
 	betCards.num = 	cardsNum
-	betCards.value = trueCards.cardValue;
+	betCards.value = trueCards and trueCards[1].cardValue;
 
-	print_lua_table(trueCards)---------@@@
+	-- print("真牌数组")
+	-- print_lua_table(trueCards)---------@@@
 	return trueCards , betCards
 end
 
@@ -170,6 +171,8 @@ function GameAiPlayer:sortCards(cards)
 end
 
 function GameAiPlayer:outPlayCard()
+	-- local singleServer = require("scenes/room/singleRoomScene/singleServer").new()
+	-- singleServer:onOutCardEvent(self.mMid)
 	EventDispatcher.getInstance():dispatch(kSingleOutCardEv , self.mMid);
 end
 

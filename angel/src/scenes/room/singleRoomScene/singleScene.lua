@@ -36,9 +36,12 @@ function SingleScene:unregisterEvent()
 end
 
 function SingleScene:init()
-    self.mGameServer = require(GameRoomPath.."singleRoomScene/singleServer").new()
+    self.mRoomInfo =  require(GameRoomPath.."roomCache").new(self)
+    self.mGameServer = require(GameRoomPath.."singleRoomScene/singleServer").new(self)
+end
 
-    self.mRoomInfo =  require(GameRoomPath.."roomCache").new()
+function SingleScene:getRoomInfo()
+    return self.mRoomInfo
 end
 
 function SingleScene:onEnter()
@@ -64,9 +67,9 @@ function SingleScene:onEnter()
     EventDispatcher.getInstance():dispatch( kSingleGameReadyEv )
 end
 
-function SingleScene:dispatchEvents(eventTable)
-    self.mGameServer:dispatchEvent(eventTable)
-end
+-- function SingleScene:dispatchEvents(eventTable)
+--     self.mGameServer:dispatchEvent(eventTable)
+-- end
 
 function SingleScene:onExit() 
 end

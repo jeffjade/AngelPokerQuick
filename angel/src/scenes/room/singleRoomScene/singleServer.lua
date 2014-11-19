@@ -8,8 +8,10 @@ SingleServer = class("SingleServer" , function()
 
 local SingleMaxPlayerNum = 4
 
-function SingleServer:ctor() 
-	self:init()
+function SingleServer:ctor(scene)
+	self.mRoomScene = scene
+	self.mRoomInfo = self.mRoomScene:getRoomInfo()
+	
 	self:registerEvent()
 end
 
@@ -17,13 +19,6 @@ function SingleServer:dtor()
 	self:unregisterEvent()
 end
 
-function SingleServer:init()
-	self.mRoomInfo =  require(GameRoomPath.."roomCache").new()
-	--[[
-	cc.GameObject.extend(self):addComponent("components.behavior.EventProtocol"):exportMethods()
-	self:addEventListener(kSingleGameReadyEv , handler(self, self.onGameReadyEvent))
-	self:addEventListener(kSingleGamePlayStartEv , handler(self, self.onPlayStartEvent))]]
-end
 
 function SingleServer:registerEvent()
 	self.mEventTable = {
@@ -47,7 +42,7 @@ function SingleServer:unregisterEvent()
 end
 
 -- ************************************LogicHelperFun*********************************************
-function SingleServer:addPlayereSelf()
+function SingleServer:addPlayerSelf()
 	self.mMySelfPlayer = require(GameRoomPath.."singleRoomScene/singlePlayer").new()
 	local meMid = 100
     self.mMySelfPlayer:setMid(meMid)
@@ -72,11 +67,11 @@ function SingleServer:addMachine()
 	end
 
 	for i = 1, maxPlayerNum - 1  do 
-		local mid = self.mAiCount or 10000000
+		local mid = self.mAiCount or 100
 		mid = mid + 1
 		self.mAiCount = mid
 
-		local cAiPlayer = import(GameRoomPath.."singleRoomScene/gameAiPlayer").new()
+		local cAiPlayer = require(GameRoomPath.."singleRoomScene/gameAiPlayer").new(self.mRoomInfo)
 		cAiPlayer:setMid(self.mAiCount)
 		cAiPlayer:setMoney(999999)
 
@@ -88,7 +83,7 @@ function SingleServer:addMachine()
 		cAiPlayer:setIcon(icon);
 		cAiPlayer:setSex(sex);
 		cAiPlayer:setNick(nick);
-		cAiPlayer:setSeat(mid - 10000000);
+		cAiPlayer:setSeat(mid - 100);
 
 		-- 设置随机出来的战绩情形
 		local level = ToolUtil.randomInt(99 , 11)
@@ -127,7 +122,6 @@ end
 function SingleServer:playReady()
 	local isAllPlayerReadyFlag = self:isAllPlayerReadyFlag()
 	if isAllPlayerReadyFlag then
-		print("SingleServer:playerReady()==============================")
 		self:dealCards()
 	end
 end
@@ -148,7 +142,7 @@ function SingleServer:dealCards()
 		player:setPlayerCards( #playerCards , playerCards )
 
 		EventDispatcher.getInstance():dispatch( kServerDealCardsEv, player:getMid() , playerCards);
-		print_lua_table(playerCards)
+		-- print_lua_table(playerCards)
 	end
 
 	self:playStart()
@@ -162,9 +156,10 @@ function SingleServer:playStart()
 	self.mRoomInfo:setCurrentPlayer(firstPlayPlayerMid)
 	self.mRoomInfo:setNextPlayer(0);
 	
-	-- QueueUtils:getInstance():sychronizedDelayCommand(nil,function()
+	-- QueueMachine:getInstance():delayCommand( function()
 	-- 	firstPlayer:thinkHowGame()
-	-- 	end ,1)
+	-- 	end , 3 )
+
 	-- QueueUtils:getInstance():sychronizedDelayCommand(firstPlayer ,
 	-- 	firstPlayer.thinkHowGame ,1)
 	firstPlayer:thinkHowGame()
@@ -215,7 +210,7 @@ end
 -- ---------------------------------onEventCallBack-----------------------------------------------
 function SingleServer:onGameReadyEvent()
 	print("SingleServer:~~~~~onGameReadyEvent")
-	self:addPlayereSelf()
+	self:addPlayerSelf()
 	self:addMachine();
 end
 
@@ -234,7 +229,7 @@ function SingleServer:onPlayStartEvent()
 end
 
 function SingleServer:onOutCardEvent(mid)
-	local player = self:findPlayerByMid(mid)
+	local player = self.mRoomInfo:findPlayerByMid(mid)
 	local cards = player:getOutCards()
 
 	local lastCards = {};
@@ -245,6 +240,9 @@ function SingleServer:onOutCardEvent(mid)
 	end
 	self.mRoomInfo:setLastOutCards(cards.count , cards.betCards , lastCards) --??
 	self.mRoomInfo:setLastPlayer(mid)
+	
+	print("Last Out Cards Is:")
+	print_lua_table(cards)
 
 	player:removeCard(cards.count , cards.outCards)
 
@@ -266,7 +264,6 @@ end
 
 function SingleServer:onPlayNextEvent(mid)
 	if mid == self.mRoomInfo:getLastPlayer() then
-		self.mRoomInfo:setLastPlayer(0);
 		-- 发送消息出去(告知这是新的一轮)
 		EventDispatcher.getInstance():dispatch(kServerPlayNewTurnEv);
 	else

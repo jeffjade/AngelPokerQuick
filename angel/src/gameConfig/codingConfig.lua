@@ -6,6 +6,7 @@
 require("common/constants")
 require("common/toolUtil")
 require("common/queueUtils")
+require("common/queueMachine")
 require("common/eventDispatcher")
 
 -- ------------------------------Logic-------------------------------------
