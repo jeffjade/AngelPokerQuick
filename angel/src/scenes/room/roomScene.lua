@@ -18,6 +18,7 @@ function RoomScene:ctor()
     self:createSelfLoadingBar()
     self:init()
     self:showCardPattern()
+    self:schedulerProcess()
 end
 
 function RoomScene:init()
@@ -28,9 +29,20 @@ function RoomScene:init()
         card.cardType = 3
         tCards[#tCards + 1] = card
     end
-	self:showMyCards(tCards)
+	--self:showMyCards(tCards)
+
+    self:showMyCards({{cardValue=3, cardType=3}, 
+        {cardValue=4, cardType=3},
+        {cardValue=5, cardType=3},
+        {cardValue=6, cardType=3},
+        {cardValue=7, cardType=3},
+        {cardValue=8, cardType=3},
+        {cardValue=9, cardType=3},
+        {cardValue=10, cardType=3},
+        {cardValue=11, cardType=3}}
+        )
     self:createOutCardButton()
-    self:showCardCall()
+    --self:showCardCall()
 end
 
 function RoomScene:onEnter()
@@ -40,7 +52,7 @@ function RoomScene:onExit()
 end
 
 function RoomScene:showSelectDialog()
-    self.m_dlgSelectCard = require(GameRoomPath .. "roomDialog/selectCardDialog").new()
+    self.m_dlgSelectCard = require(GameRoomPath .. "roomDialog/selectCardDialog").new(self.m_cardUi)
     self:addChild(self.m_dlgSelectCard)
 end
 
@@ -58,10 +70,10 @@ end
 
 function RoomScene:showMyCards(tCards)
 	--Debug 加载牌
-    local cardui = require(GameRoomPath .. "roomMyCardUI").new()
-    cardui:createCards(tCards)
-    cardui:placeCard()
-    self:addChild(cardui)
+    self.m_cardUi = require(GameRoomPath .. "roomMyCardUI").new()
+    self.m_cardUi:createCards(tCards)
+    self.m_cardUi:placeCard()
+    self:addChild(self.m_cardUi)
 end
 
 -- 加载人物一
@@ -124,6 +136,30 @@ end
 function RoomScene:showCardCall()
     self.m_cardCall = require(GameRoomPath .. "roomDialog/cardCall").new({{cardType=1, cardValue=3},{cardType=1, cardValue=3}})
     self:addChild(self.m_cardCall)
+end
+
+function RoomScene:schedulerProcess()
+    local scheduler = require("framework.scheduler")
+
+    local percent = 0
+    local function onInterval(dt)
+        percent = (percent + 1) % 100 + 1
+
+        percent1 = (percent + 20) % 100 + 1
+        self.m_widgetProgressBarFirstPerson:setPercent(percent1)
+
+        percent2 = (percent + 40) % 100 + 1
+        self.m_widgetProgressBarSecondPerson:setPercent(percent2)
+
+        percent3 = (percent + 60) % 100 + 1
+        self.m_widgetProgressBarThirdPerson:setPercent(percent3)
+
+        percentSelf = (percent + 90) % 100 + 1
+
+        self.m_selfLoadingBar:setPercent(percentSelf)
+    end
+
+    scheduler.scheduleGlobal(onInterval, 0.05)    
 end
 
 return RoomScene

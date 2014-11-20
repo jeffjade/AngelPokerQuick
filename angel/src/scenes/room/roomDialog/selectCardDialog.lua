@@ -31,8 +31,9 @@ function SelectCardDialog:createMask()
 	self:addChild(imgMask)
 end
 
-function SelectCardDialog:ctor()
+function SelectCardDialog:ctor(roomMyCardUI)
 	self.m_cards = {}
+	self.m_roomMyCardUI = roomMyCardUI
 
 	self:init()
 	self:createMask()
@@ -80,7 +81,11 @@ end
 
 --创造 A
 function SelectCardDialog:createACards()
-	local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg")
+	local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg"):onButtonClicked(
+		function()
+			self.m_roomMyCardUI:updateStatus()
+			self:setVisible(false)
+		end)
 	local labelCard = cc.ui.UILabel.new({UILabelType=1, text="A",font="futura-48.fnt"})
 	btnCard:scale(0.5)
 	labelCard:pos(-13, 0)
@@ -92,7 +97,11 @@ end
 --创造数字牌 2~10
 function SelectCardDialog:createNumCards()
 	for i = 10, 2, -1 do
-  		local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg")
+  		local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg"):onButtonClicked(
+		function()
+			self.m_roomMyCardUI:updateStatus()
+			self:setVisible(false)
+		end)
 		local labelCard = cc.ui.UILabel.new({UILabelType=1, text=tostring(i),font="futura-48.fnt", size=30})
 		labelCard:pos(-13, 0)
 		btnCard:scale(0.5)
@@ -107,7 +116,11 @@ function SelectCardDialog:createLetterCards()
 	local tCards = {"K", "Q", "J"}
 
 	for _, v in ipairs(tCards) do
-		local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg")
+		local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg"):onButtonClicked(
+		function()
+			self.m_roomMyCardUI:updateStatus()
+			self:setVisible(false)
+		end)
 		local labelCard = cc.ui.UILabel.new({UILabelType=1, text=v, font="futura-48.fnt"})
 		labelCard:pos(-13, 0)
 		btnCard:scale(0.5)
