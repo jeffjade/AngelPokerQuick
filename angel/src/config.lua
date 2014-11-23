@@ -23,3 +23,5 @@ CONFIG_SCREEN_HEIGHT = 800
 
 -- auto scale mode
 CONFIG_SCREEN_AUTOSCALE = "FIXED_WIDTH"
+
+GameRoomPath = "scenes/room/"
