@@ -28,15 +28,6 @@ function Card:ctor(cardValue, cardType, roomMycardUI)
 
 	self:setAnchorPoint(0, 0)
 	self:createCard()
-
---debug
-	self.onCardClicked = function()
-		print("hello, i am card clicked")
-	end
-	EventDispatchController:addEventListener("CLICK_CARD"
-			, handler(self, self.onCardClicked))
---debug
-
 end
 
 --根据牌型、牌值 返回牌精灵控件
@@ -182,6 +173,10 @@ function Card:createCardR()
 			self:updateCardStatus()
 		end)
 	self:addChild(self.m_card)
+end
+
+function Card:getCard()
+	return self.m_card
 end
 
 return Card

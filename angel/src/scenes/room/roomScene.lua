@@ -22,14 +22,6 @@ function RoomScene:ctor()
 end
 
 function RoomScene:init()
-	local tCards = {}
-    for i = 1, 49 do
-        local card = {}
-        card.cardValue = 15
-        card.cardType = 3
-        tCards[#tCards + 1] = card
-    end
-	--self:showMyCards(tCards)
 
     self:showMyCards({{cardValue=3, cardType=3}, 
         {cardValue=4, cardType=3},
@@ -41,8 +33,17 @@ function RoomScene:init()
         {cardValue=10, cardType=3},
         {cardValue=11, cardType=3}}
         )
+
     self:createOutCardButton()
-    --self:showCardCall()
+
+    self:flyOutCardsBySeat(1,
+    {{cardValue=3, cardType=3},
+    {cardValue=3, cardType=3},
+    {cardValue=3, cardType=3}})
+end
+
+function RoomScene:flyOutCardsBySeat(seat, tCards)
+    self.m_cardUi:flyOutPlayerCards(seat, tCards)
 end
 
 function RoomScene:onEnter()

@@ -16,6 +16,7 @@ local RoomMyCardUIParams =
 
 function RoomMyCardUI:ctor()	
 	self.m_cards = {}
+	self.m_cardsOtherPlayer = {}
 	self.m_statusCards = {}
 	self.m_numCards = 0
 	self.m_numUpperCards = 0
@@ -146,5 +147,26 @@ function RoomMyCardUI:placeCard()
 	self:placeLowerLevel()
 end
 
+--1、2、3 号位出牌飞出
+function RoomMyCardUI:flyOutPlayerCards(seatSequence, tCards)
+	for k, v in ipairs(tCards) do
+		local card = require(GameRoomPath .. "card").new(v.cardValue, v.cardType, self)
+		self.m_cardsOtherPlayer[#self.m_cardsOtherPlayer + 1] = card
+		if seatSequence and 1 == seatSequence then
+			card:setPosition(100, 300)
+		elseif seatSequence and 2 == seatSequence then
+			card:setPosition(400, 600)
+		elseif seatSequence and 3 == seatSequence then
+			card:setPosition(800, 600)
+		end
+
+		card:setScale(0.2)
+		card:setAnchorPoint(0, 0)
+		card:getCard():setButtonEnabled(false)
+		transition.moveTo(card, {x = display.cx +  k * 30, y = display.cy-50, time = 1})
+
+		self:addChild(card)
+	end
+end
 
 return RoomMyCardUI

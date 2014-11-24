@@ -85,10 +85,6 @@ function SelectCardDialog:createACards()
 		function()
 			self.m_roomMyCardUI:updateStatus()
 			self:setVisible(false)
---debug
-	EventDispatchController:dispatchEvent({name = "CLICK_CARD"})
-	print("what happend")
---debug
 		end)
 	local labelCard = cc.ui.UILabel.new({UILabelType=1, text="A",font="futura-48.fnt"})
 	btnCard:scale(0.5)
