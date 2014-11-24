@@ -4,14 +4,32 @@
 
 local singleRobot = require("scenes/room/singleRoomScene/singleRobot")
 SingleServer = class("SingleServer" , function()
-    return display.newScene("SingleScene") end)
+    return display.newNode()
+end)
+
+-- local SingleScene  = import(GameRoomPath.."/singleRoomScene/singleScene")
+-- local GameAiPlayer = import(GameRoomPath..".singleRoomScene.GameAiPlayer")
+require(GameRoomPath.."/singleRoomScene/gameAiPlayer")
 
 local SingleMaxPlayerNum = 4
 
 function SingleServer:ctor(scene)
+	cc(self):addComponent("components.behavior.EventProtocol"):exportMethods() 
+
+	-- self.gameAiPlayer = GameAiPlayer.new()
+    -- self.gameAiPlayer:addEventListener( "SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent) )
+    -- print(self.gameAiPlayer:getFuck())
+    -- cc.EventProxy.new(self.gameAiPlayer , self)
+		-- :addEventListener("SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent))
+	-- self:addChild(self.gameAiPlayer)
+    g_SingleServer = self;
+
 	self.mRoomScene = scene
 	self.mRoomInfo = self.mRoomScene:getRoomInfo()
 	
+	EventDispatchController:addEventListener("kSingleGameReadyEv" , handler(self, self.onGameReadyEvent))
+	EventDispatchController:addEventListener( "SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent) )
+
 	self:registerEvent()
 end
 
@@ -21,7 +39,26 @@ end
 
 
 function SingleServer:registerEvent()
-	self.mEventTable = {
+	-- cc.GameObject.extend(self):addComponent("components.behavior.EventProtocol"):exportMethods()
+	
+    -- self.mSingleScene = SingleScene.new()
+    -- self.mSingleScene:addEventListener( "kSingleGameReadyEv" , handler(self, self.onGameReadyEvent), data)
+    -- self:addChild(self.mSingleScene)
+
+
+	-- self:addEventListener(kSingleGameReadyEv , handler(self, self.onGameReadyEvent))
+	-- self:addEventListener(kSingleGamePlayStartEv , handler(self, self.onPlayStartEvent))
+
+	-- cc.GameObject.extend(self) :addComponent("components.behavior.EventProtocol"):exportMethods()
+	-- self:addEventListener("kSingleGameReadyEv" , handler(self, self.onGameReadyEvent))
+	-- self:addEventListener(kSingleGamePlayStartEv , handler(self, self.onPlayStartEvent))
+	-- self:addEventListener( "SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent) )
+
+    -- cc.EventProxy.new(self.gameAiPlayer , self)
+	-- 	:addEventListener("SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent))
+	-- self:addChild(self.gameAiPlayer)
+
+	--[[self.mEventTable = {
 		[kSingleGameReadyEv] 		= self.onGameReadyEvent;
 		[kSingleGamePlayStartEv]    = self.onPlayStartEvent;
 		[kSingleOutCardEv]          = self.onOutCardEvent;
@@ -32,7 +69,7 @@ function SingleServer:registerEvent()
 
 	for k,v in pairs(self.mEventTable) do
 		EventDispatcher.getInstance():register(k, self ,v);
-	end
+	end]]
 end
 
 function SingleServer:unregisterEvent()
@@ -71,11 +108,11 @@ function SingleServer:addMachine()
 		mid = mid + 1
 		self.mAiCount = mid
 
-		local cAiPlayer = require(GameRoomPath.."singleRoomScene/gameAiPlayer").new(self.mRoomInfo)
+		local cAiPlayer = GameAiPlayer.new(self.mRoomInfo)
 		cAiPlayer:setMid(self.mAiCount)
 		cAiPlayer:setMoney(999999)
 
-		local cAiRobot, index = ToolUtil.randomItem(singleRobotData);
+		local cAiRobot , index = ToolUtil.randomItem(singleRobotData);
 		table.remove(singleRobotData, index);
 		local sex = cAiRobot.sex;
 		local nick = cAiRobot.name;
@@ -122,6 +159,8 @@ end
 function SingleServer:playReady()
 	local isAllPlayerReadyFlag = self:isAllPlayerReadyFlag()
 	if isAllPlayerReadyFlag then
+		self.mRoomInfo.fuck = 999
+		print("???fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck)
 		self:dealCards()
 	end
 end
@@ -169,7 +208,8 @@ function SingleServer:nextPlayerPlay()
 	local player = self:getNextPlayer()
 	if player then
 		local mid = player:getMid()
-		EventDispatcher.getInstance():dispatch( kServerPlayNextEv , mid)
+		self:onPlayNextEvent(mid)
+		-- EventDispatcher.getInstance():dispatch( kServerPlayNextEv , mid)
 
 		self.mRoomInfo:setCurrentPlayer(mid)
 		local direction = player:getDirection()
@@ -208,7 +248,7 @@ end
 
 
 -- ---------------------------------onEventCallBack-----------------------------------------------
-function SingleServer:onGameReadyEvent()
+function SingleServer:onGameReadyEvent(data)
 	print("SingleServer:~~~~~onGameReadyEvent")
 	self:addPlayerSelf()
 	self:addMachine();
@@ -228,7 +268,10 @@ function SingleServer:onPlayStartEvent()
 	firstPlayer:thinkHowGame()
 end
 
-function SingleServer:onOutCardEvent(mid)
+function SingleServer:onOutCardEvent(event)
+	local mid = event.mid
+	
+	print("@@@@fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck.." mid = "..mid)
 	local player = self.mRoomInfo:findPlayerByMid(mid)
 	local cards = player:getOutCards()
 
@@ -241,8 +284,8 @@ function SingleServer:onOutCardEvent(mid)
 	self.mRoomInfo:setLastOutCards(cards.count , cards.betCards , lastCards) --??
 	self.mRoomInfo:setLastPlayer(mid)
 	
-	print("Last Out Cards Is:")
-	print_lua_table(cards)
+	-- print("SingleServer Last Out Cards Is:")
+	-- print_lua_table(cards)
 
 	player:removeCard(cards.count , cards.outCards)
 
@@ -259,7 +302,8 @@ function SingleServer:onOutCardEvent(mid)
 end
 
 function SingleServer:onTurnCardEvent(mid)
-	
+	-- 控制将上一家所打的牌给翻出来-以验明真假;
+
 end
 
 function SingleServer:onPlayNextEvent(mid)
@@ -270,8 +314,8 @@ function SingleServer:onPlayNextEvent(mid)
 		-- do nothing
 	end
 
-
 	if mid ~= PhpInfo:getMid() then
+		print("!!!!!fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck)
 		local player = self.mRoomInfo:findPlayerByMid(mid);
 		-- QueueUtils:getInstance():sychronizedDelayCommand(nil,function()
 		-- 		player:thinkHowGame()

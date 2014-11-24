@@ -14,7 +14,7 @@ function SinglePlayer:dtor()
 end
 
 function SinglePlayer:thinkHowGame()
-	print("GameAiPlayer:thinkHowGame()~~~~~~~")
+	print("=== !!! SinglePlayer:thinkHowGame()~~~~~~~")
 end
 
 function SinglePlayer:sortCards(cards)
@@ -22,6 +22,7 @@ function SinglePlayer:sortCards(cards)
 end
 
 function SinglePlayer:removeCard(count ,info)
+	count = count or 0
 	local curCount = self.mPlayerCards.count;
 	local cards = self.mPlayerCards.cards;
 	local tmp = {};

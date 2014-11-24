@@ -2,6 +2,7 @@
 -- Date : 2014.11.04
 -- Desc : Require Be Preloaded Coding
 
+require("gameConfig/stringConfig")
 -- ------------------------------Common------------------------------------
 require("common/constants")
 require("common/toolUtil")

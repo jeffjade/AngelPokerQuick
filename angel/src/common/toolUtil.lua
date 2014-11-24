@@ -371,6 +371,35 @@ function print_r(root)
     print(_dump(root, "",""))
 end
 
+function _DebugLogWriteToFile_(root)
+	root = root or "the root is nil?"
+	local outLogFile = io.open("DebugLogFile.txt", "a")
+
+	if type(root) == "table" or type(root) == "userdata" then 
+		local cache = {  [root] = "." }
+    	local function _dump(t,space,name)
+        local temp = {}
+        for k,v in pairs(t) do
+            local key = tostring(k)
+            if cache[v] then
+                table.insert(temp,"+" .. key .. " {" .. cache[v].."}")
+            elseif type(v) == "table" then
+                local new_key = name .. "." .. key
+                cache[v] = new_key
+                table.insert(temp,"+" .. key .. _dump(v,space .. (next(t,k) and "|" or " " ).. string.rep(" ",#key),new_key))
+            else
+                table.insert(temp,"+" .. key .. " [" .. tostring(v).."]")
+            end
+        end
+        return table.concat(temp,"\n"..space)
+	    end
+	    outLogFile:write(_dump(root , "",""))
+	else
+		outLogFile:write(root)
+	end
+	outLogFile:close()
+end
+
 function ToolUtil.concatString(...)
 	local data={...}
 	local str=""

@@ -118,7 +118,6 @@ end
 
 
 function RoomCache:addPlayer(player)
-	print_r(player)
 	local mid = player:getMid()
 	if self.mPlayerMap[mid] == nil then
 		self.mPlayerNum = self.mPlayerNum + 1;
@@ -129,6 +128,8 @@ function RoomCache:addPlayer(player)
 		self.mMySelf = player;
 		self:setMe(player)
 	end
+	
+	_DebugLogWriteToFile_(self.mPlayerMap)
 end
 
 -- removePlayer[player]
@@ -159,6 +160,18 @@ function RoomCache:findPlayerByMid(mid)
 	-- print_r(self.mPlayerMap[mid])
 	if not self.mPlayerMap[mid] then 
 		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$mid =="..mid)
+	end
+	if not self.mPlayerMap[100] then 
+		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$mid =="..100)
+	end
+	if not self.mPlayerMap[101] then 
+		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$mid =="..101)
+	end
+	if not self.mPlayerMap[102] then 
+		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$mid =="..102)
+	end
+	if not self.mPlayerMap[103] then 
+		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$mid =="..103)
 	end
 	return self.mPlayerMap and self.mPlayerMap[mid];
 end
@@ -202,7 +215,7 @@ function RoomCache:updateDirection(player)
 	self:changePlayerDirection(player, direction);
 end
 
---[[removePlayer
+--[[calcPlayerDirection
 	@Param  : player : roomPlayer
 	@return : numbe -direction(1~4)]]
 function RoomCache:calcPlayerDirection(player)

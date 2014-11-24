@@ -6,8 +6,11 @@ local SinglePlayer = require(GameRoomPath.."singleRoomScene/singlePlayer")
 GameAiPlayer = class("GameAiPlayer" , SinglePlayer)
 
 function GameAiPlayer:ctor(roomInfo)
+	cc.GameObject.extend(self):addComponent("components.behavior.EventProtocol"):exportMethods()
+	-- cc(self):addComponent("components.behavior.EventProtocol"):exportMethods() 
+
 	self.mRoomInfo = roomInfo
-	self:registerEvent()
+	-- self:registerEvent()
 end
 
 function GameAiPlayer:dtor()
@@ -32,6 +35,11 @@ function GameAiPlayer:getRoomInfo()
 	return self.mRoomInfo
 end
 
+function GameAiPlayer:getFuck()
+	local str = "cao ni , fuck !!!================================================= "
+	return str
+end
+
 function GameAiPlayer:thinkHowGame(lastMid)
 	local lastMid = self.mRoomInfo:getLastPlayer();
 	print("~~~~~~~~GameAiPlayer mid is:"..self.mMid)
@@ -46,7 +54,8 @@ function GameAiPlayer:thinkHowGame(lastMid)
 		outCards , betCards = self:outLargeCard(myCards);
 	end
 
-	-- print_lua_table(outCards)
+	print_lua_table(outCards)
+	-- _DebugLogWriteToFile_(outCards)
 
 	if outCards and next(outCards) then
 		self:setOutCards(#outCards, betCards, outCards);
@@ -171,13 +180,15 @@ function GameAiPlayer:sortCards(cards)
 end
 
 function GameAiPlayer:outPlayCard()
-	-- local singleServer = require("scenes/room/singleRoomScene/singleServer").new()
-	-- singleServer:onOutCardEvent(self.mMid)
-	EventDispatcher.getInstance():dispatch(kSingleOutCardEv , self.mMid);
+	-- EventDispatcher.getInstance():dispatch(kSingleOutCardEv , self.mMid);
+	print("GameAiPlayer:outPlayCard()~~~~~~~~~~~~~~~~~~~~~~mid ="..self.mMid)
+	-- g_SingleServer:onOutCardEvent(self.mMid)
+
+	EventDispatchController:dispatchEvent( {name = "SINGLE_SERVER_OUT_CARDS", mid = self.mMid} )
 end
 
 function GameAiPlayer:turnPlayCard()
-	EventDispatcher.getInstance():dispatch(kSingleTurnCardEv , self.mMid);
+	-- EventDispatcher.getInstance():dispatch(kSingleTurnCardEv , self.mMid);
 end
 
 -- -----------------------------onEventCallBack-----------------------------
@@ -189,4 +200,4 @@ function GameAiPlayer:onPlayerOutCardEvent(mid)
 end
 -- -----------------------------onEventCallBack-----------------------------
 
-return GameAiPlayer
+-- return GameAiPlayer

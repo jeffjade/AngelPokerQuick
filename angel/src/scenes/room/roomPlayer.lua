@@ -2,7 +2,9 @@
 -- Date : 2014.10.28 19:56
 -- Auth : JeffYang
 
-RoomPlayer = class("RoomPlayer")
+RoomPlayer = class("RoomPlayer" , function()
+	return display.newNode()
+end)
 
 function RoomPlayer:ctor()
 end

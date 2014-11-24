@@ -10,6 +10,8 @@ SingleScene.PLAY_START = "singlePlayStartEvent"
 
 
 function SingleScene:ctor()
+    cc.GameObject.extend(self):addComponent("components.behavior.EventProtocol"):exportMethods()
+
 	self.super.ctor(self)
 
     cc.ui.UILabel.new({UILabelType = 2, text = "SINGLE GAME", size = 64 ,color = cc.c3b(22,222,22)})
@@ -63,8 +65,13 @@ function SingleScene:onEnter()
 
     end):align(display.CENTER,display.right-100 ,display.top-50):addTo(self);
   
-    -- self:dispatchEvents( {name = "singleGameReadyEvent"} )
-    EventDispatcher.getInstance():dispatch( kSingleGameReadyEv )
+
+    -- self:dispatchEvent( {name = "kSingleGameReadyEv"} )
+    -- EventDispatcher.getInstance():dispatch( kSingleGameReadyEv )
+    -- self.mGameServer:onGameReadyEvent()
+
+    -- g_SingleServer:onGameReadyEvent()
+    EventDispatchController:dispatchEvent({name = "kSingleGameReadyEv"})
 end
 
 -- function SingleScene:dispatchEvents(eventTable)
