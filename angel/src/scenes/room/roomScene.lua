@@ -19,6 +19,7 @@ function RoomScene:ctor()
     self:init()
     self:showCardPattern()
     self:schedulerProcess()
+    self:registerEvent()
 end
 
 function RoomScene:init()
@@ -40,6 +41,10 @@ function RoomScene:init()
     {{cardValue=3, cardType=3},
     {cardValue=3, cardType=3},
     {cardValue=3, cardType=3}})
+end
+
+function RoomScene:registerEvent()
+    
 end
 
 function RoomScene:flyOutCardsBySeat(seat, tCards)

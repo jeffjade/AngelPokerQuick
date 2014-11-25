@@ -15,20 +15,11 @@ function RoomPlayerUi:dtor()
 end
 
 function RoomPlayerUi:registerEvent()
-	self.mEventTable = {
-		[kServerDealCardsEv]        = self.onGameDealCardsEvent;
-		[kServerPlayOverEv] 		= self.onGamePlayOverEvent;
-	}
-
-	for k,v in pairs(self.mEventTable) do
-		EventDispatcher.getInstance():register(k, self ,v);
-	end
+	-- EventDispatchController:addEventListener( "kServerDealCardsEv" ,    handler(self, self.onGameDealCardsEvent))
 end
 
 function RoomPlayerUi:unregisterEvent()
-	for k,v in pairs(self.mEventTable) do
-		EventDispatcher.getInstance():unregister(k, self ,v);
-	end
+	
 end
 
 -- ************************************LogicHelperFun*********************************************
@@ -40,7 +31,7 @@ end
 
 
 -- ---------------------------------OnEventCallBack-----------------------------------------------
-function RoomPlayerUi:onGameDealCardsEvent(mid)
+function RoomPlayerUi:onGameDealCardsEvent(event)
 	if mid == PhpInfo.getMid() then
 		self:showMyCard()
 	end

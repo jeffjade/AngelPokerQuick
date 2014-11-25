@@ -21,6 +21,13 @@ function SingleScene:init()
     self.mGameServer = require(GameRoomPath.."singleRoomScene/singleServer").new(self)
 end
 
+function SingleScene:registerEvent()
+    EventDispatchController:addEventListener( "kServerPlayStartEv" ,      handler(self, self.onPlayStartEvent))
+    EventDispatchController:addEventListener("kServerDealCardsEv" ,      handler(self, self.onGameDealCardsEvent))
+    EventDispatchController:addEventListener("kServerPlayNextEv" ,       handler(self, self.onPlayNextEvent))
+    EventDispatchController:addEventListener("kServerPlayerOutCardsEv" , handler(self, self.onPlayOutCardsEvent))
+end
+
 function SingleScene:getRoomInfo()
     return self.mRoomInfo
 end
@@ -44,27 +51,49 @@ function SingleScene:onEnter()
 
     end):align(display.CENTER,display.right-100 ,display.top-50):addTo(self);
   
-
-    -- self:dispatchEvent( {name = "kSingleGameReadyEv"} )
-    -- self.mGameServer:onGameReadyEvent()
     EventDispatchController:dispatchEvent({name = "kSingleGameReadyEv"})
 end
 
--- function SingleScene:dispatchEvents(eventTable)
---     self.mGameServer:dispatchEvent(eventTable)
--- end
+function SingleScene:onExit()
 
-function SingleScene:onExit() 
 end
 
 function SingleScene:onCleanup()
 end
 
-function SingleScene:onGameDealCardsEvent(mid , myCards)
-	if mid == PhpInfo:getMid() then
-		print_lua_table(myCards)
-		self:showMyCards(myCards)
+-- ---------------------------------onEventCallBack-----------------------------------------------
+function SingleScene:onPlayStartEvent(event)
+    if event.mid == PhpInfo:getMid() then
+        self:createOutCardButton()
+    end
+end
+
+function SingleScene:onGameDealCardsEvent(event)
+	if event.mid == PhpInfo:getMid() then
+		print_lua_table(event.playerCards)
+		self:showMyCards(event.playerCards)
 	end
 end
+
+function SingleScene:onPlayNextEvent(event)
+    if event.mid == PhpInfo:getMid() then
+        self:createOutCardButton()
+    end
+end
+
+function SingleScene:onPlayOutCardsEvent(event)
+    local mid = event.mid
+    local outCards = event.outCards
+    local player = self.mRoomInfo:findPlayerByMid(mid)
+    local seat = player:getSeat()
+    if mid ~= PhpInfo:getMid() then
+        self:flyOutCardsBySeat(seat , outCards)
+    else
+        -- 播放玩家自己出牌 之 (动画)
+        
+    end
+end
+-- ---------------------------------onEventCallBack-----------------------------------------------
+
 
 return SingleScene

@@ -26,6 +26,7 @@ end
 
 function SingleServer:registerEvent()
 	EventDispatchController:addEventListener( "kSingleGameReadyEv" ,      handler(self, self.onGameReadyEvent))
+	EventDispatchController:addEventListener( "kServerPlayStartEv" ,      handler(self, self.onPlayStartEvent))
 	EventDispatchController:addEventListener( "SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent) )
 	EventDispatchController:addEventListener( "kServerTurnPlayCardsEv" ,  handler(self, self.onTurnCardEvent) )
 	EventDispatchController:addEventListener( "kServerPlayNextEv" ,       handler(self, self.onPlayNextEvent) )
@@ -137,28 +138,22 @@ function SingleServer:dealCards()
 		playerCards = CardUtil.sortCardsByValue( playerCards ) -- 对牌排序
 		player:setPlayerCards( #playerCards , playerCards )
 
-		EventDispatcher.getInstance():dispatch( kServerDealCardsEv, player:getMid() , playerCards);
+		EventDispatchController:dispatchEvent( {name = "kServerDealCardsEv", mid = player:getMid(),  playerCards = playerCards} )
 		-- print_lua_table(playerCards)
 	end
 
-	self:playStart()
+	self:stipulateFirstPoker()
 end
 
-function SingleServer:playStart()
-	print("SingleServer:playStart()~~~~~~~~~~~~~")
+function SingleServer:stipulateFirstPoker()
 	local firstPlayPlayerMid = self:findStandsOutMid()
 	local firstPlayer = self:findPlayerByMid(firstPlayPlayerMid)
 
 	self.mRoomInfo:setCurrentPlayer(firstPlayPlayerMid)
 	self.mRoomInfo:setNextPlayer(0);
-	
-	-- QueueMachine:getInstance():delayCommand( function()
-	-- 	firstPlayer:thinkHowGame()
-	-- 	end , 3 )
 
-	-- QueueUtils:getInstance():sychronizedDelayCommand(firstPlayer ,
-	-- 	firstPlayer.thinkHowGame ,1)
-	firstPlayer:thinkHowGame()
+	-- Start Playing Cards
+	EventDispatchController:dispatchEvent( {name = "kServerPlayStartEv", mid = firstPlayer:getMid() } )
 end
 
 function SingleServer:nextPlayerPlay()
@@ -201,7 +196,7 @@ function SingleServer:gamePlayOver()
 	end
 	self.mRoomInfo:setGameOverInfo(gameOverList , gameOverPlayerList)
 
-	EventDispatcher.getInstance():dispatch( kServerPlayOverEv , mid)
+	-- EventDispatcher.getInstance():dispatch( kServerPlayOverEv , mid)
 end
 -- ************************************LogicHelperFun*********************************************
 
@@ -213,17 +208,19 @@ function SingleServer:onGameReadyEvent(data)
 	self:addMachine();
 end
 
-function SingleServer:onPlayStartEvent()
+function SingleServer:onPlayStartEvent(event)
 	-- 发消息告诉现在进入新的一轮;
-	EventDispatcher.getInstance():dispatch(kServerPlayNewTurnEv);
+	-- EventDispatcher.getInstance():dispatch(kServerPlayNewTurnEv);
 
 	self.mHadPlay = true
+	local firstPlayerMid = event.mid
+	local firstPlayer = self:findPlayerByMid(firstPlayerMid)
+	-- QueueMachine:getInstance():delayCommand( function()
+	-- 	firstPlayer:thinkHowGame()
+	-- 	end , 3 )
 
-	local firstPlayPlayerMid = self:findStandsOutMid()
-	self.mRoomInfo:setCurrentPlayer(firstPlayPlayerMid)
-	self.mRoomInfo:setNextPlayer(0);
-
-	local firstPlayer = self:findPlayerByMid(firstPlayPlayerMid)
+	-- QueueUtils:getInstance():sychronizedDelayCommand(firstPlayer ,
+	-- 	firstPlayer.thinkHowGame ,1)
 	firstPlayer:thinkHowGame()
 end
 
@@ -252,10 +249,10 @@ function SingleServer:onOutCardEvent(event)
 	if gameIsOver then
 		self.mRoomInfo:setWinner(mid)
 		self.mRoomInfo:setNextPlayer(0)
-		EventDispatcher.getInstance():dispatch(kServerPlayerOutCardsEv , mid);
+		EventDispatchController:dispatchEvent({name = "kServerPlayerOutCardsEv" , mid = mid ,outCards = cards.outCards})
 		self:gamePlayOver();
 	elseif mid ~= 0 then
-		EventDispatcher.getInstance():dispatch(kServerPlayerOutCardsEv , mid);
+		EventDispatchController:dispatchEvent({name = "kServerPlayerOutCardsEv" , mid = mid ,outCards = cards.outCards})
 		self:nextPlayerPlay();
 	end
 end
