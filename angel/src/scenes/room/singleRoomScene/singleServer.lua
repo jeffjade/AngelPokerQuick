@@ -7,29 +7,16 @@ SingleServer = class("SingleServer" , function()
     return display.newNode()
 end)
 
--- local SingleScene  = import(GameRoomPath.."/singleRoomScene/singleScene")
--- local GameAiPlayer = import(GameRoomPath..".singleRoomScene.GameAiPlayer")
+local GameAiPlayer = import(GameRoomPath..".singleRoomScene.GameAiPlayer")
+
 require(GameRoomPath.."/singleRoomScene/gameAiPlayer")
 
 local SingleMaxPlayerNum = 4
 
+
 function SingleServer:ctor(scene)
-	cc(self):addComponent("components.behavior.EventProtocol"):exportMethods() 
-
-	-- self.gameAiPlayer = GameAiPlayer.new()
-    -- self.gameAiPlayer:addEventListener( "SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent) )
-    -- print(self.gameAiPlayer:getFuck())
-    -- cc.EventProxy.new(self.gameAiPlayer , self)
-		-- :addEventListener("SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent))
-	-- self:addChild(self.gameAiPlayer)
-    g_SingleServer = self;
-
 	self.mRoomScene = scene
 	self.mRoomInfo = self.mRoomScene:getRoomInfo()
-	
-	EventDispatchController:addEventListener("kSingleGameReadyEv" , handler(self, self.onGameReadyEvent))
-	EventDispatchController:addEventListener( "SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent) )
-
 	self:registerEvent()
 end
 
@@ -37,45 +24,15 @@ function SingleServer:dtor()
 	self:unregisterEvent()
 end
 
-
 function SingleServer:registerEvent()
-	-- cc.GameObject.extend(self):addComponent("components.behavior.EventProtocol"):exportMethods()
-	
-    -- self.mSingleScene = SingleScene.new()
-    -- self.mSingleScene:addEventListener( "kSingleGameReadyEv" , handler(self, self.onGameReadyEvent), data)
-    -- self:addChild(self.mSingleScene)
-
-
-	-- self:addEventListener(kSingleGameReadyEv , handler(self, self.onGameReadyEvent))
-	-- self:addEventListener(kSingleGamePlayStartEv , handler(self, self.onPlayStartEvent))
-
-	-- cc.GameObject.extend(self) :addComponent("components.behavior.EventProtocol"):exportMethods()
-	-- self:addEventListener("kSingleGameReadyEv" , handler(self, self.onGameReadyEvent))
-	-- self:addEventListener(kSingleGamePlayStartEv , handler(self, self.onPlayStartEvent))
-	-- self:addEventListener( "SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent) )
-
-    -- cc.EventProxy.new(self.gameAiPlayer , self)
-	-- 	:addEventListener("SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent))
-	-- self:addChild(self.gameAiPlayer)
-
-	--[[self.mEventTable = {
-		[kSingleGameReadyEv] 		= self.onGameReadyEvent;
-		[kSingleGamePlayStartEv]    = self.onPlayStartEvent;
-		[kSingleOutCardEv]          = self.onOutCardEvent;
-		[kSingleTurnCardEv]         = self.onTurnCardEvent;
-
-		[kServerPlayNextEv]         = self.onPlayNextEvent;
-	}
-
-	for k,v in pairs(self.mEventTable) do
-		EventDispatcher.getInstance():register(k, self ,v);
-	end]]
+	EventDispatchController:addEventListener( "kSingleGameReadyEv" ,      handler(self, self.onGameReadyEvent))
+	EventDispatchController:addEventListener( "SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent) )
+	EventDispatchController:addEventListener( "kServerTurnPlayCardsEv" ,  handler(self, self.onTurnCardEvent) )
+	EventDispatchController:addEventListener( "kServerPlayNextEv" ,       handler(self, self.onPlayNextEvent) )
 end
 
 function SingleServer:unregisterEvent()
-	for k,v in pairs(self.mEventTable) do
-		EventDispatcher.getInstance():unregister(k, self ,v);
-	end
+
 end
 
 -- ************************************LogicHelperFun*********************************************
@@ -206,10 +163,12 @@ end
 
 function SingleServer:nextPlayerPlay()
 	local player = self:getNextPlayer()
+	print("SingleServer:nextPlayerPlay()==============!!!!")
 	if player then
 		local mid = player:getMid()
-		self:onPlayNextEvent(mid)
-		-- EventDispatcher.getInstance():dispatch( kServerPlayNextEv , mid)
+		print("SingleServer:nextPlayerPlay() mid ="..mid)
+		-- self:onPlayNextEvent(mid)
+		EventDispatchController:dispatchEvent( {name = "kServerPlayNextEv", mid = mid} )
 
 		self.mRoomInfo:setCurrentPlayer(mid)
 		local direction = player:getDirection()
@@ -270,7 +229,7 @@ end
 
 function SingleServer:onOutCardEvent(event)
 	local mid = event.mid
-	
+
 	print("@@@@fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck.." mid = "..mid)
 	local player = self.mRoomInfo:findPlayerByMid(mid)
 	local cards = player:getOutCards()
@@ -301,12 +260,15 @@ function SingleServer:onOutCardEvent(event)
 	end
 end
 
-function SingleServer:onTurnCardEvent(mid)
-	-- 控制将上一家所打的牌给翻出来-以验明真假;
+function SingleServer:onTurnCardEvent(event)
+	local mid = event.mid
 
+	-- 控制将上一家所打的牌给翻出来-以验明真假;
+	print("@@@@ onTurnCardEvent fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck.." mid = "..mid)
 end
 
-function SingleServer:onPlayNextEvent(mid)
+function SingleServer:onPlayNextEvent(event)
+	local mid = event.mid
 	if mid == self.mRoomInfo:getLastPlayer() then
 		-- 发送消息出去(告知这是新的一轮)
 		EventDispatcher.getInstance():dispatch(kServerPlayNewTurnEv);

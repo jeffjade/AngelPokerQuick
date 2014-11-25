@@ -8,33 +8,12 @@ local SingleScene = class("SingleScene", RoomScene)
 SingleScene.GAME_READY = "singleGameReadyEvent"
 SingleScene.PLAY_START = "singlePlayStartEvent"
 
-
 function SingleScene:ctor()
-    cc.GameObject.extend(self):addComponent("components.behavior.EventProtocol"):exportMethods()
-
 	self.super.ctor(self)
 
     cc.ui.UILabel.new({UILabelType = 2, text = "SINGLE GAME", size = 64 ,color = cc.c3b(22,222,22)})
         :align(display.CENTER, display.cx, display.top-50)
         :addTo(self)
-
-    self:registerEvent()
-    self:init()
-end
-
-function SingleScene:registerEvent()
-	self.mEventTable = {
-		[kServerDealCardsEv] 		= self.onGameDealCardsEvent;
-	}
-	for k,v in pairs(self.mEventTable) do
-		EventDispatcher.getInstance():register(k, self ,v);
-	end
-end
-
-function SingleScene:unregisterEvent()
-	for k,v in pairs(self.mEventTable) do
-		EventDispatcher.getInstance():unregister(k, self ,v);
-	end
 end
 
 function SingleScene:init()
@@ -67,10 +46,7 @@ function SingleScene:onEnter()
   
 
     -- self:dispatchEvent( {name = "kSingleGameReadyEv"} )
-    -- EventDispatcher.getInstance():dispatch( kSingleGameReadyEv )
     -- self.mGameServer:onGameReadyEvent()
-
-    -- g_SingleServer:onGameReadyEvent()
     EventDispatchController:dispatchEvent({name = "kSingleGameReadyEv"})
 end
 

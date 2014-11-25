@@ -6,11 +6,7 @@ local SinglePlayer = require(GameRoomPath.."singleRoomScene/singlePlayer")
 GameAiPlayer = class("GameAiPlayer" , SinglePlayer)
 
 function GameAiPlayer:ctor(roomInfo)
-	cc.GameObject.extend(self):addComponent("components.behavior.EventProtocol"):exportMethods()
-	-- cc(self):addComponent("components.behavior.EventProtocol"):exportMethods() 
-
 	self.mRoomInfo = roomInfo
-	-- self:registerEvent()
 end
 
 function GameAiPlayer:dtor()
@@ -18,13 +14,7 @@ function GameAiPlayer:dtor()
 end
 
 function GameAiPlayer:registerEvent()
-	self.mEventTable = {
-		[kServerPlayerOutCardsEv] 		= self.onPlayerOutCardEvent;
-	}
 
-	for k,v in pairs(self.mEventTable) do
-		EventDispatcher.getInstance():register(k, self ,v);
-	end
 end
 
 function GameAiPlayer:setMoney()
@@ -180,15 +170,13 @@ function GameAiPlayer:sortCards(cards)
 end
 
 function GameAiPlayer:outPlayCard()
-	-- EventDispatcher.getInstance():dispatch(kSingleOutCardEv , self.mMid);
 	print("GameAiPlayer:outPlayCard()~~~~~~~~~~~~~~~~~~~~~~mid ="..self.mMid)
-	-- g_SingleServer:onOutCardEvent(self.mMid)
-
 	EventDispatchController:dispatchEvent( {name = "SINGLE_SERVER_OUT_CARDS", mid = self.mMid} )
 end
 
 function GameAiPlayer:turnPlayCard()
-	-- EventDispatcher.getInstance():dispatch(kSingleTurnCardEv , self.mMid);
+	EventDispatchController:dispatchEvent( {name = "kServerTurnPlayCardsEv", mid = self.mMid} )
+	print("GameAiPlayer:turnPlayCard()  ==========mid ="..self.mMid)
 end
 
 -- -----------------------------onEventCallBack-----------------------------
@@ -200,4 +188,4 @@ function GameAiPlayer:onPlayerOutCardEvent(mid)
 end
 -- -----------------------------onEventCallBack-----------------------------
 
--- return GameAiPlayer
+return GameAiPlayer
