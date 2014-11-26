@@ -3,49 +3,6 @@
 -- Coder: JeffYang
 
 require "bit"
-CardType = {};
-
-function print_lua_table (lua_table, indent)
-    if not lua_table or type(lua_table) ~= "table" then
-        return;
-    end
-
-	if not next(lua_table) then
-		print("here table is {}!")
-	end
-
-    indent = indent or 0
-    for k, v in pairs(lua_table) do
-        if type(k) == "string" then
-            k = string.format("%q", k)
-        end
-        local szSuffix = ""
-        if type(v) == "table" then
-            szSuffix = "{"
-        end
-        local szPrefix = string.rep("    ", indent)
-        formatting = szPrefix.."["..k.."]".." = "..szSuffix
-        if type(v) == "table" then
-            print(formatting)
-            print_lua_table(v, indent + 1)
-            print(szPrefix.."},")
-        else
-            local szValue = ""
-            if type(v) == "string" then
-                szValue = string.format("%q", v)
-            else
-                szValue = tostring(v)
-            end
-            print(formatting..szValue..",")
-        end
-    end
-end
-
-CardType.CT_ERROR  = 0;      --  0.错误
-CardType.CT_SINGLE = 1;      --  1.单牌
-CardType.CT_DOUBLE = 2;      --  2.对牌
-CardType.CT_THREE  = 3;      --  3.三张
-CardType.CT_FOUR   = 4;      --  4.四张
 
 CardUtil = {};
 
@@ -196,25 +153,28 @@ end
     @Desc   : 验证Player所打之牌是否为真(出的牌和叫的牌一致)]]
 CardUtil.judgePlayIsTrue = function(outCards, betCards)
 	for k , v in pairs(outCards) do
-		if type(v) ~= "table" or not v.cardByte or 
-		   type(betCards[k]) ~= "table" or not betCards[k].cardByte then 
+		if type(v) ~= "table" or not v.cardValue or 
+		   type(betCards[k]) ~= "table" or not betCards[k].cardValue then 
 		   error("need judge cards are not legal !")
-		elseif v.cardByte ~= betCards[k].cardByte then 
+		elseif v.cardValue ~= betCards[k].cardValue then 
 			return false
 		end
 	end
 	return true
 end
 
+
+--[[
 local allCards = CardUtil.getAllCardsWithNoKings()
 local shuffleCards = CardUtil.shuffleCards(allCards)
 local playerCards , otherCards = CardUtil.get13cards(allCards)
 playerCards = CardUtil.sortCardsByValue(playerCards)
+
 -- print_lua_table(playerCards)
 -- print("===================")
 -- print_lua_table(otherCards)
 
---[[
+
 function randomInt(max_num, min_num)
 	local min_num = min_num or 0;
 	local num = max_num - min_num;

@@ -32,6 +32,10 @@ function SingleScene:getRoomInfo()
     return self.mRoomInfo
 end
 
+function SingleScene:getPlayerByMd(mid)
+    return self.mRoomInfo:findPlayerByMid(mid)
+end
+
 function SingleScene:onEnter()
 	local images = {
         normal = "GreenButton.png",

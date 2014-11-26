@@ -12,7 +12,7 @@ require("common/eventDispatcher")
 
 -- ------------------------------Logic-------------------------------------
 require("logic/bit")
-require("logic/cardType")
+require("logic/cardUtil")
 
 -- ----------------------------Game Data-------------------------------------
 require("gameData/phpInfo")
