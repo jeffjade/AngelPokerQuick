@@ -184,7 +184,7 @@ function SingleServer:gamePlayOver()
 	local maxPlayerNum = SingleMaxPlayerNum
 	for i = 1 , maxPlayerNum do 
 		local player = self.mRoomInfo:findPlayerByDirection( i )
-		if player and next(player) then
+		if player then
 			local playerInfo = {}
 			playerInfo.mid   = player:getMid()
 			playerInfo.nick  = player:getNick()
@@ -234,7 +234,10 @@ function SingleServer:onOutCardEvent(event)
 	local lastCards = {};
 	if cards.outCards then
 		for k, v in ipairs(cards.outCards) do
-			lastCards[k] = v.cardValue;
+			lastCards[k] = {}
+			lastCards[k].cardValue = v.cardValue
+			lastCards[k].cardType = v.cardType
+			lastCards[k].cardByte = v.cardByte
 		end
 	end
 	self.mRoomInfo:setLastOutCards(cards.count , cards.betCards , lastCards) --??

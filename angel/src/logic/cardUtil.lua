@@ -151,12 +151,19 @@ end
 --[[@Param  : outCards[所出牌之表],betCards[所叫牌之表]
     @return : true(两个表相同)/false(两表不同)
     @Desc   : 验证Player所打之牌是否为真(出的牌和叫的牌一致)]]
-CardUtil.judgePlayIsTrue = function(outCards, betCards)
+CardUtil.judgePlayIsTrue = function(outCards , betCards)
+	if not outCards  or not betCards or type(outCards) ~= "table" or type(betCards) ~= "table"  then
+		error("CardUtil:need judge cards are not legal (1)!")
+	end
+
+	if #outCards ~= betCards.num then
+		return false
+	end
+
 	for k , v in pairs(outCards) do
-		if type(v) ~= "table" or not v.cardValue or 
-		   type(betCards[k]) ~= "table" or not betCards[k].cardValue then 
-		   error("need judge cards are not legal !")
-		elseif v.cardValue ~= betCards[k].cardValue then 
+		if type(v) ~= "table" or not v.cardValue or type(betCards) ~= "table" or not betCards.cardValue then 
+		   error("CardUtil: need judge cards are not legal (2)!")
+		elseif v.cardValue ~= betCards.cardValue then 
 			return false
 		end
 	end

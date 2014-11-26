@@ -103,7 +103,7 @@ function GameAiPlayer:outBetTrueCard(Cards)
 	-- 得到有效的真牌表(剔除空table)
 	for k , v in pairs(trueCardsTempist) do
 		if v and type(v) and next(v) then
-			table.insert(trueCardsList , v) 
+			table.insert(trueCardsList , v) 	
 		end
 	end
 
@@ -117,7 +117,7 @@ function GameAiPlayer:outBetTrueCard(Cards)
 
 	local betCards ={}
 	betCards.num = 	cardsNum
-	betCards.value = trueCards and trueCards[1].cardValue;
+	betCards.cardValue = trueCards and trueCards[1].cardValue;
 
 	-- print("真牌数组")
 	-- print_lua_table(trueCards)---------@@@
@@ -179,7 +179,10 @@ function GameAiPlayer:turnPlayCard()
 	local outCards, betCards = lastCards.outCards , lastCards.betCards
 
 	local outIsTrue = CardUtil.judgePlayIsTrue(outCards, betCards)
+
+	print("GameAiPlayer:turnPlayCard()  ====outIsTrue ="..(outIsTrue and "true" or "false"))
 	print("GameAiPlayer:turnPlayCard()  ==========mid ="..self.mMid)
+
 
 	EventDispatchController:dispatchEvent( {name = "kServerTurnPlayCardsEv" , 
 											mid = self.mMid ,
