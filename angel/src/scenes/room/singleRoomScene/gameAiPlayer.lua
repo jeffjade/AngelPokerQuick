@@ -25,11 +25,6 @@ function GameAiPlayer:getRoomInfo()
 	return self.mRoomInfo
 end
 
-function GameAiPlayer:getFuck()
-	local str = "cao ni , fuck !!!================================================= "
-	return str
-end
-
 function GameAiPlayer:thinkHowGame(lastMid)
 	local lastMid = self.mRoomInfo:getLastPlayer();
 	print("~~~~~~~~GameAiPlayer mid is:"..self.mMid)
@@ -38,7 +33,7 @@ function GameAiPlayer:thinkHowGame(lastMid)
 	local betCards;
 
 	local myCards = self:getPlayerCards().cards;
-	if lastMid == 0 or lastMid == self.mMid then
+	if 1 or lastMid == 0 or lastMid == self.mMid then
 		outCards , betCards = self:outFirstCard(myCards);
 	else
 		outCards , betCards = self:outLargeCard(myCards);

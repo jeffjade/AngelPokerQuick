@@ -31,7 +31,7 @@ function SingleServer:registerEvent()
 end
 
 function SingleServer:unregisterEvent()
-	
+
 end
 
 -- ************************************LogicHelperFun*********************************************
@@ -200,8 +200,7 @@ end
 
 
 -- ---------------------------------onEventCallBack-----------------------------------------------
-function SingleServer:onGameReadyEvent(data)
-	print("SingleServer:~~~~~onGameReadyEvent")
+function SingleServer:onGameReadyEvent()
 	self:addPlayerSelf()
 	self:addMachine();
 end
@@ -209,7 +208,6 @@ end
 function SingleServer:onPlayStartEvent(event)
 	-- 发消息告诉现在进入新的一轮;
 	-- EventDispatcher.getInstance():dispatch(kServerPlayNewTurnEv);
-
 	self.mHadPlay = true
 
 	local function onCallThinkHowGame()
@@ -219,7 +217,6 @@ function SingleServer:onPlayStartEvent(event)
 	end
 
 	QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 1 )
-
 	--[[QueueUtils:getInstance():sychronizedDelayCommand(firstPlayer ,
 		firstPlayer.thinkHowGame ,1)
 	firstPlayer:thinkHowGame()]]
@@ -326,7 +323,7 @@ function SingleServer:getNextPlayer()
 end
 
 function SingleServer:findPlayerByDirection(direction)
-	print("SingleServer:findPlayerByDirection======")
+	print("SingleServer:findPlayerByDirection====== direction "..direction)
 	local player = self.mRoomInfo:findPlayerByDirection(direction)
 	return player
 end
