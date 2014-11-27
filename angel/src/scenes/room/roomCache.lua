@@ -129,7 +129,7 @@ function RoomCache:addPlayer(player)
 		self:setMe(player)
 	end
 	
-	_DebugLogWriteToFile_(self.mPlayerMap)
+	-- _DebugLogWriteToFile_(self.mPlayerMap)
 end
 
 -- removePlayer[player]
@@ -153,7 +153,7 @@ function RoomCache:resetAllPlayers()
 	end
 end
 
---[[ findPlayerByMid
+--[[ findPlayerByMid 
     @Param : mid(number)
 	@return : roomPlayer]]
 function RoomCache:findPlayerByMid(mid)

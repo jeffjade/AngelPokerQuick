@@ -48,7 +48,7 @@ function QueueUtils:asyncDelayCommand()
 				if #funcParam ~= 0 then 
 					funcName(obj,unpack(funcParam));
 				else
-					funcName();
+					funcName(obj);
 				end
 				table.remove(self.queueAnim[i]);
 			end,second);

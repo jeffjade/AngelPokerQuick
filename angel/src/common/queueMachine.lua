@@ -2,21 +2,27 @@
 -- Date : 2014.11.18
 -- Desc : provide Fun For Msg Dispatching
 
-QueueMachine = class("QueueMachine");
+QueueMachine = {} -- class("QueueMachine");
 
-function QueueMachine:ctor()
-	self.mTimersList = {} 
-end
+-- function QueueMachine:ctor()
+-- 	self.mTimersList = {} 
+-- end
 
-function QueueMachine:dtor()
-	self.mTimersList = nil
-end
+-- function QueueMachine:dtor()
+-- 	self.mTimersList = nil
+-- end
 
 function QueueMachine:getInstance()
- 	if not QueueMachine.instance then 
-		QueueMachine.instance = QueueMachine.new();
+	if not self.mTimersList  then
+		self.mTimersList = {} 
 	end
-	return QueueMachine.instance;
+	
+	return QueueMachine
+
+	-- if not QueueMachine.instance then 
+	-- 	QueueMachine.instance = QueueMachine.new();
+	-- end
+	-- return QueueMachine.instance;
 end
 
 function QueueMachine:delayCommand(func , delay , ...)
@@ -41,8 +47,7 @@ function QueueMachine:delayCommand(func , delay , ...)
 		self.mTimersList[id] = nil;
 		if pak then
 			pak[1](unpack(pak[2]));
-			scheduler = nil
-			-- delete(pak[3]);
+			pak[3] = nil
 		end
 	end , delay);
 

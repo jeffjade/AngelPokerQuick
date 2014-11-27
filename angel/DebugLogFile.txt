@@ -1,7 +1,1 @@
-##DebufLog2014年11月26日21時31分25秒+100 [userdata: 0x067fff60]+100 [userdata: 0x067fff60]
-+101 [userdata: 0x06800400]+102 [userdata: 0x067f3148]
-+100 [userdata: 0x067fff60]
-+101 [userdata: 0x06800400]+103 [userdata: 0x06800318]
-+102 [userdata: 0x067f3148]
-+100 [userdata: 0x067fff60]
-+101 [userdata: 0x06800400]
+##DebufLog2014年11月27日20時27分14秒

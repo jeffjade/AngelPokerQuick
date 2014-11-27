@@ -3,9 +3,7 @@
 -- Auth : JeffYang
 
 local singleRobot = require("scenes/room/singleRoomScene/singleRobot")
-SingleServer = class("SingleServer" , function()
-    return display.newNode()
-end)
+SingleServer = class("SingleServer")
 
 local GameAiPlayer = import(GameRoomPath..".singleRoomScene.GameAiPlayer")
 
@@ -33,7 +31,7 @@ function SingleServer:registerEvent()
 end
 
 function SingleServer:unregisterEvent()
-
+	
 end
 
 -- ************************************LogicHelperFun*********************************************
@@ -213,15 +211,18 @@ function SingleServer:onPlayStartEvent(event)
 	-- EventDispatcher.getInstance():dispatch(kServerPlayNewTurnEv);
 
 	self.mHadPlay = true
-	local firstPlayerMid = event.mid
-	local firstPlayer = self:findPlayerByMid(firstPlayerMid)
-	-- QueueMachine:getInstance():delayCommand( function()
-	-- 	firstPlayer:thinkHowGame()
-	-- 	end , 3 )
 
-	-- QueueUtils:getInstance():sychronizedDelayCommand(firstPlayer ,
-	-- 	firstPlayer.thinkHowGame ,1)
-	firstPlayer:thinkHowGame()
+	local function onCallThinkHowGame()
+		local firstPlayerMid = event.mid
+		local firstPlayer = self:findPlayerByMid(firstPlayerMid)
+		firstPlayer:thinkHowGame()
+	end
+
+	QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 1 )
+
+	--[[QueueUtils:getInstance():sychronizedDelayCommand(firstPlayer ,
+		firstPlayer.thinkHowGame ,1)
+	firstPlayer:thinkHowGame()]]
 end
 
 function SingleServer:onOutCardEvent(event)
@@ -278,11 +279,12 @@ function SingleServer:onPlayNextEvent(event)
 
 	if mid ~= PhpInfo:getMid() then
 		print("!!!!!fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck)
-		local player = self.mRoomInfo:findPlayerByMid(mid);
-		-- QueueUtils:getInstance():sychronizedDelayCommand(nil,function()
-		-- 		player:thinkHowGame()
-		-- 	end ,1)
-		player:thinkHowGame()
+		local function onCallThinkHowGame()
+			local player = self.mRoomInfo:findPlayerByMid(mid);
+			player:thinkHowGame()
+		end
+
+		QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 1 )
 	end
 end
 -- ---------------------------------onEventCallBack-----------------------------------------------

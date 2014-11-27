@@ -628,6 +628,7 @@ function cutoutCommonWith2Table(tableA , tableB)
     return result
 end
 
+--[[
 local co = coroutine.create(function()
 	local a = {2,2,2,4,5}
 	local array = ToolUtil.combination(a,2);
@@ -640,5 +641,4 @@ local co = coroutine.create(function()
 	-- end
 end)
 
-coroutine.resume(co)
-
+coroutine.resume(co)]]
