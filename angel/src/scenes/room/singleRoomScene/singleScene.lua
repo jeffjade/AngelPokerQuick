@@ -90,12 +90,16 @@ function SingleScene:onPlayOutCardsEvent(event)
     local outCards = event.outCards
     local player = self.mRoomInfo:findPlayerByMid(mid)
     local seat = player:getSeat()
+    local playerCards = player:getPlayerCards()
+    local leftCount = playerCards.count
+    print("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo count" .. leftCount)
     if mid ~= PhpInfo:getMid() then
         print("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo " .. seat)
         self:flyOutCardsBySeat(seat , outCards)
+        self:showPlayerLeftCardCount(seat , leftCount )
     else
         -- 播放玩家自己出牌 之 (动画)
-        
+        self:showPlayerLeftCardCount(seat , leftCount)
     end
 end
 -- ---------------------------------onEventCallBack-----------------------------------------------

@@ -48,17 +48,18 @@ function SinglePlayer:removeCard(count ,info)
 			new_cards[new_count] = card;
 		end
 	end
+	-- print_lua_table( new_cards )
 
 	self.mPlayerCards.cards = new_cards
 	self.mPlayerCards.count = new_count
 end
 
 function SinglePlayer:outPlayCard()
-	EventDispatcher.getInstance():dispatch(kSingleOutCardEv , self.meMid);
+	
 end
 
 function SinglePlayer:turnPlayCard()
-	EventDispatcher.getInstance():dispatch(kSingleTurnCardEv , self.meMid);
+	
 end
 
 return SinglePlayer

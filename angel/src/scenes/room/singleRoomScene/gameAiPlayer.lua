@@ -178,7 +178,6 @@ function GameAiPlayer:turnPlayCard()
 	print("GameAiPlayer:turnPlayCard()  ====outIsTrue ="..(outIsTrue and "true" or "false"))
 	print("GameAiPlayer:turnPlayCard()  ==========mid ="..self.mMid)
 
-
 	EventDispatchController:dispatchEvent( {name = "kServerTurnPlayCardsEv" , 
 											mid = self.mMid ,
 											outIsTrue = outIsTrue} )

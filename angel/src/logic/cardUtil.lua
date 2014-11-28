@@ -52,6 +52,7 @@ CardUtil.getAllCardsWithNoKings = function()
 	return cardInfos;
 end
 
+
 --[[/**
  * 从 cards 中随机取出17张牌，取出的牌会从 cards 中删除
  * @param cards
@@ -86,10 +87,11 @@ CardUtil.get13cards = function(cards)
 	return list,cards;
 end
 
+
 CardUtil.show = function(cards)
 	for i, v in ipairs(cards) do
-		DebugLog("cardByte: " .. (v.cardByte or "nil"));
-		DebugLog("cardType: " .. (v.cardType or "nil"));
+		DebugLog("cardByte : " .. (v.cardByte  or "nil"));
+		DebugLog("cardType : " .. (v.cardType  or "nil"));
 		DebugLog("cardValue: " .. (v.cardValue or "nil"));
 	end
 end
@@ -109,6 +111,7 @@ CardUtil.generateCards = function()
 	return rtn;
 end
 
+
 -- 洗牌[2014.11.06~~21:38]
 CardUtil.shuffleCards = function(cards)
 	math.randomseed(tostring(os.time()):reverse():sub(1, 6))
@@ -119,6 +122,7 @@ CardUtil.shuffleCards = function(cards)
 	end
 	return cards
 end
+
 
 CardUtil.getCardInfo = function(cardByte)
 	local cardTypeValue = cardByte;
@@ -139,6 +143,7 @@ CardUtil.getCardInfo = function(cardByte)
 	return cardInfo;
 end
 
+
 -- 按照牌面的大小对牌进行排序[14.11.08]
 CardUtil.sortCardsByValue = function(cards)
 	table.sort(cards, 
@@ -147,6 +152,7 @@ CardUtil.sortCardsByValue = function(cards)
 		end)
 	return cards
 end
+
 
 --[[@Param  : outCards[所出牌之表],betCards[所叫牌之表]
     @return : true(两个表相同)/false(两表不同)
@@ -168,6 +174,16 @@ CardUtil.judgePlayIsTrue = function(outCards , betCards)
 		end
 	end
 	return true
+end
+
+-- Get CardByte Form CardValue And CardType [2014.11.29  01:30]
+CardUtil.getCardByteByValueType = function( cardValue , cardType )
+	local allCards = CardUtil.getAllCardsWithNoKings()
+	for k , v in pairs( allCards ) do 
+		if cardValue == v.cardValue and cardType == v.cardType then
+			return v.cardByte
+		end
+	end
 end
 
 

@@ -80,6 +80,26 @@ function MainScene:createScene()
 		display.replaceScene(singleScene,"slideInR",0.5, display.COLOR_WHITE)
 	end)
 	:addTo(self)
+
+
+    local loseAnim = require("animation/animLose").new()
+    self:addChild(loseAnim)
+    loseAnim:start()
+
+    -- self:createNumberAnim()
+end
+
+
+-- 创建一个帧动画
+function MainScene:createNumberAnim()
+    display.addSpriteFrames("loseWind.plist", "loseWind.png") --添加帧缓存
+    local sp = display.newSprite("#wind01.png", display.cx, display.cy)
+    -- local frames = display.newFrames("wind%02d.png", 1, 11)
+    self:addChild(sp)
+
+    local frames = display.newFrames("wind%02d.png", 1, 11)
+    local animation = display.newAnimation(frames, 2.8/14.0)
+    sp:playAnimationOnce(animation )
 end
 
 return MainScene

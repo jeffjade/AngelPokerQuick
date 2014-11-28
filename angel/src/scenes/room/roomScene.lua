@@ -54,6 +54,10 @@ end
 function RoomScene:registerEvent()
 end
 
+function RoomScene:showPlayerLeftCardCount(seat , count)
+    self.m_cardUi:showCardsAmountBySeat(seat, count)
+end
+
 function RoomScene:flyOutCardsBySeat(seat, tCards)
     self.m_cardUi:flyOutPlayerCards(seat, tCards)
 end

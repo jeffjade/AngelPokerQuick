@@ -38,10 +38,16 @@ function RoomMyCardUI:onPlayerSelectCardEvent(event)
 		local card = {}
 		card.cardValue = v.m_cardValue
 		card.cardType = v.m_cardType
+		card.cardByte = CardUtil.getCardByteByValueType(card.cardValue , card.cardType)
 		cards[#cards + 1] = card
 	end
 	player:setOutCards(#cards, {num = #cards, cardValue = event.cardValue}, cards)
-	EventDispatchController:dispatchEvent( {name = "SINGLE_SERVER_OUT_CARDS", mid = PhpInfo:getMid()} )
+
+	-- print_lua_table( cards )
+	player:removeCard(#cards , cards)
+
+	EventDispatchController:dispatchEvent( {name = "SINGLE_SERVER_OUT_CARDS", mid = PhpInfo:getMid() } )
+	EventDispatchController:dispatchEvent({name = "kServerPlayerOutCardsEv" , mid = PhpInfo:getMid() ,outCards = cards})
 end
 
 function RoomMyCardUI:updateStatus()
