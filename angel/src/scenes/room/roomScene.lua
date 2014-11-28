@@ -22,6 +22,9 @@ function RoomScene:ctor()
     self:registerEvent()
 end
 
+function RoomScene:getPlayerByMid(mid)
+end
+
 function RoomScene:init()
 
     self:showMyCards({{cardValue=3, cardType=3}, 
@@ -44,7 +47,6 @@ function RoomScene:init()
 end
 
 function RoomScene:registerEvent()
-    
 end
 
 function RoomScene:flyOutCardsBySeat(seat, tCards)
@@ -76,7 +78,7 @@ end
 
 function RoomScene:showMyCards(tCards)
 	--Debug 加载牌
-    self.m_cardUi = require(GameRoomPath .. "roomMyCardUI").new()
+    self.m_cardUi = require(GameRoomPath .. "roomMyCardUI").new(self)
     self.m_cardUi:createCards(tCards)
     self.m_cardUi:placeCard()
     self:addChild(self.m_cardUi)

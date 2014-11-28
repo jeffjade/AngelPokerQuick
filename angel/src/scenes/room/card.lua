@@ -1,5 +1,3 @@
-
-
 --[[
 	local card = require(GameRoomPath .. "card").new(1, 2):createCard()
 ]]
@@ -71,29 +69,6 @@ function Card:updateCardStatus()
 	end
 end
 
--- function Card:updateRoomCardUICards()
--- 	local roomCards = {}
--- 	roomCards = self.m_roomCardUI.m_cards
-
--- 	for k, v in pairs(roomCards) do
--- 		if v == self then
--- 			roomCards[k] = nil
--- 		end
--- 	end
-
--- 	local cards = {}
--- 	for k, v in pairs(roomCards) do
--- 		cards[cards + 1] = v
--- 	end
-
--- 	roomCards = {}
-
--- 	for k, v in ipairs(cards) do
--- 		roomCards[roomCards + 1] = v
--- 	end
-
--- 	return roomCards
--- end
 
 function Card:createCardF()
 	display.addSpriteFrames("card_f.plist", "card_f.png")

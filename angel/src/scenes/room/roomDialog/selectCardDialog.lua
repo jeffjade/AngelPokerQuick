@@ -85,6 +85,7 @@ function SelectCardDialog:createACards()
 		function()
 			self.m_roomMyCardUI:updateStatus()
 			self:setVisible(false)
+			EventDispatchController:dispatchEvent( {name = "kPlayerSelectCardEv", cardValue = 14} )
 		end)
 	local labelCard = cc.ui.UILabel.new({UILabelType=1, text="A",font="futura-48.fnt"})
 	btnCard:scale(0.5)
@@ -96,11 +97,14 @@ end
 
 --创造数字牌 2~10
 function SelectCardDialog:createNumCards()
-	for i = 10, 2, -1 do
+	for i = 10, 3, -1 do
   		local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg"):onButtonClicked(
 		function()
 			self.m_roomMyCardUI:updateStatus()
 			self:setVisible(false)
+			local value = i
+			-- print("<<<<<<<<<<<<<<<<<<<<<<<< " .. value)
+			EventDispatchController:dispatchEvent( {name = "kPlayerSelectCardEv", cardValue = value} )
 		end)
 		local labelCard = cc.ui.UILabel.new({UILabelType=1, text=tostring(i),font="futura-48.fnt", size=30})
 		labelCard:pos(-13, 0)
@@ -109,17 +113,34 @@ function SelectCardDialog:createNumCards()
 
 		self.m_cards[#self.m_cards + 1] = btnCard
 	end
+
+--创造数字牌 2
+	local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg"):onButtonClicked(
+	function()
+		self.m_roomMyCardUI:updateStatus()
+		self:setVisible(false)
+		EventDispatchController:dispatchEvent( {name = "kPlayerSelectCardEv", cardValue = 15} )
+	end)
+	local labelCard = cc.ui.UILabel.new({UILabelType=1, text=tostring(2),font="futura-48.fnt", size=30})
+	labelCard:pos(-13, 0)
+	btnCard:scale(0.5)
+	btnCard:addChild(labelCard)
+
+	self.m_cards[#self.m_cards + 1] = btnCard
 end
 
 --创造字母牌 J ~ K( 除了 A 之外 )
 function SelectCardDialog:createLetterCards()
 	local tCards = {"K", "Q", "J"}
+	local tValue = {13, 12, 11}
 
-	for _, v in ipairs(tCards) do
+	for k, v in ipairs(tCards) do
 		local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg"):onButtonClicked(
 		function()
 			self.m_roomMyCardUI:updateStatus()
 			self:setVisible(false)
+			-- print("<<<<<<<<<<<<<<<<<<<<<<<< " .. tValue[k])
+			EventDispatchController:dispatchEvent( {name = "kPlayerSelectCardEv", cardValue = tValue[k]} )
 		end)
 		local labelCard = cc.ui.UILabel.new({UILabelType=1, text=v, font="futura-48.fnt"})
 		labelCard:pos(-13, 0)

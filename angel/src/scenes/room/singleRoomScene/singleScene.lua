@@ -32,7 +32,7 @@ function SingleScene:getRoomInfo()
     return self.mRoomInfo
 end
 
-function SingleScene:getPlayerByMd(mid)
+function SingleScene:getPlayerByMid(mid)
     return self.mRoomInfo:findPlayerByMid(mid)
 end
 
@@ -91,6 +91,7 @@ function SingleScene:onPlayOutCardsEvent(event)
     local player = self.mRoomInfo:findPlayerByMid(mid)
     local seat = player:getSeat()
     if mid ~= PhpInfo:getMid() then
+        print("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo " .. seat)
         self:flyOutCardsBySeat(seat , outCards)
     else
         -- 播放玩家自己出牌 之 (动画)

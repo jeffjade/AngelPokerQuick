@@ -14,16 +14,44 @@ local RoomMyCardUIParams =
 	ScaleFactor = 0.25,             --缩放因子
 }
 
-function RoomMyCardUI:ctor()	
+function RoomMyCardUI:ctor(scene)	
+	self.m_scene = scene
 	self.m_cards = {}
 	self.m_cardsOtherPlayer = {}
 	self.m_statusCards = {}
 	self.m_numCards = 0
 	self.m_numUpperCards = 0
 	self.m_numLowerCards = 0
+
+	self:registerRoomMyCardUIEvents()
+end
+
+function RoomMyCardUI:registerRoomMyCardUIEvents()
+    EventDispatchController:addEventListener( "kPlayerSelectCardEv" ,  handler(self, self.onPlayerSelectCardEvent))
+end
+
+function RoomMyCardUI:onPlayerSelectCardEvent(event)
+	local player = self.m_scene:getPlayerByMid(PhpInfo:getMid())
+	local cards = {}
+
+	for k, v in pairs(self.m_statusCards) do
+		local card = {}
+		card.cardValue = v.m_cardValue
+		card.cardType = v.m_cardType
+		cards[#cards + 1] = card
+	end
+	player:setOutCards(#cards, {num = #cards, cardValue = event.cardValue}, cards)
+	EventDispatchController:dispatchEvent( {name = "SINGLE_SERVER_OUT_CARDS", mid = PhpInfo:getMid()} )
 end
 
 function RoomMyCardUI:updateStatus()
+	local statusCards = {}
+	for k, v in pairs(self.m_statusCards) do
+		statusCards[#statusCards + 1] = v
+	end
+
+	self.m_statusCards = statusCards
+
 	table.sort(self.m_statusCards, function(a, b)
 			return b.m_cardValue > a.m_cardValue
 		end)
@@ -152,12 +180,15 @@ function RoomMyCardUI:flyOutPlayerCards(seatSequence, tCards)
 	for k, v in ipairs(tCards) do
 		local card = require(GameRoomPath .. "card").new(v.cardValue, v.cardType, self)
 		self.m_cardsOtherPlayer[#self.m_cardsOtherPlayer + 1] = card
-		if seatSequence and 1 == seatSequence then
+		if seatSequence and 3 == seatSequence then
 			card:setPosition(100, 300)
+			print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 3")
 		elseif seatSequence and 2 == seatSequence then
 			card:setPosition(400, 600)
-		elseif seatSequence and 3 == seatSequence then
+			print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 2")
+		elseif seatSequence and 1 == seatSequence then
 			card:setPosition(800, 600)
+			print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 1")
 		end
 
 		card:setScale(0.2)
