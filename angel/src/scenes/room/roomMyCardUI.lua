@@ -175,20 +175,17 @@ function RoomMyCardUI:placeCard()
 	self:placeLowerLevel()
 end
 
---1、2、3 号位出牌飞出
+--0、1、2、3 号位出牌飞出
 function RoomMyCardUI:flyOutPlayerCards(seatSequence, tCards)
 	for k, v in ipairs(tCards) do
 		local card = require(GameRoomPath .. "card").new(v.cardValue, v.cardType, self)
 		self.m_cardsOtherPlayer[#self.m_cardsOtherPlayer + 1] = card
 		if seatSequence and 3 == seatSequence then
 			card:setPosition(100, 300)
-			print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 3")
 		elseif seatSequence and 2 == seatSequence then
 			card:setPosition(400, 600)
-			print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 2")
 		elseif seatSequence and 1 == seatSequence then
 			card:setPosition(800, 600)
-			print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 1")
 		end
 
 		card:setScale(0.2)
@@ -197,6 +194,39 @@ function RoomMyCardUI:flyOutPlayerCards(seatSequence, tCards)
 		transition.moveTo(card, {x = display.cx +  k * 30, y = display.cy-50, time = 1})
 
 		self:addChild(card)
+	end
+end
+
+--0、1、2、3 号剩余数量牌展示
+function RoomMyCardUI:showCardsAmountBySeat(seat, num)
+	if 0 == seat then
+		if not self.m_labelCardsMe then
+			self.m_labelCardsMe = cc.ui.UILabel.new({UILabelType=1, text="0",font="boundsTestFont.fnt"})
+			self.m_labelCardsMe:setPosition(1185, 20)
+			self:addChild(self.m_labelCardsMe)
+		end
+		self.m_labelCardsMe:setString(num)
+	elseif 1 == seat then
+		if not self.m_labelCardsSeatOne then
+			self.m_labelCardsSeatOne = cc.ui.UILabel.new({UILabelType=1, text="0",font="boundsTestFont.fnt"})
+			self.m_labelCardsSeatOne:setPosition(820, 510)
+			self:addChild(self.m_labelCardsSeatOne)
+		end
+		self.m_labelCardsSeatOne:setString(num)
+	elseif 2 == seat then
+		if not self.m_labelCardsSeatTwo then
+			self.m_labelCardsSeatTwo = cc.ui.UILabel.new({UILabelType=1, text="0",font="boundsTestFont.fnt"})
+			self.m_labelCardsSeatTwo:setPosition(370, 510)
+			self:addChild(self.m_labelCardsSeatTwo)
+		end
+		self.m_labelCardsSeatTwo:setString(num)
+	elseif 3 == seat then
+		if not self.m_labelCardsSeatThree then
+			self.m_labelCardsSeatThree = cc.ui.UILabel.new({UILabelType=1, text="0",font="boundsTestFont.fnt"})
+			self.m_labelCardsSeatThree:setPosition(50, 270)
+			self:addChild(self.m_labelCardsSeatThree)
+		end
+		self.m_labelCardsSeatThree:setString(num)
 	end
 end
 

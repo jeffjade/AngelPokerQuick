@@ -44,6 +44,11 @@ function RoomScene:init()
     {{cardValue=3, cardType=3},
     {cardValue=3, cardType=3},
     {cardValue=3, cardType=3}})
+
+    self.m_cardUi:showCardsAmountBySeat(3, 12)
+    self.m_cardUi:showCardsAmountBySeat(2, 10)
+    self.m_cardUi:showCardsAmountBySeat(1, 13)
+    self.m_cardUi:showCardsAmountBySeat(0, 15)
 end
 
 function RoomScene:registerEvent()
