@@ -38,6 +38,7 @@ function RoomScene:init()
         )
 
     self:createOutCardButton()
+    self:createFollowButton()
 
     self:flyOutCardsBySeat(1,
     {{cardValue=3, cardType=3},
@@ -74,8 +75,9 @@ end
 
 function RoomScene:createOutCardButton()
     if not self.m_btnOutCard then
-        self.m_btnOutCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx, display.cy - 80)
+        self.m_btnOutCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx - 100, display.cy - 80)
         self.m_btnOutCard:onButtonClicked(function()
+            self.m_btnOutCard:setVisible(false)
             self:showSelectDialog()
         end)
         self:addChild(self.m_btnOutCard)
@@ -83,6 +85,22 @@ function RoomScene:createOutCardButton()
         local imgBtnInnerCircle = cc.ui.UIImage.new("btnOutCardInnerCircle.png")
         imgBtnInnerCircle:setPosition(-32, -32)
         self.m_btnOutCard:addChild(imgBtnInnerCircle)
+    end
+    self.m_btnOutCard:setVisible(true)
+end
+
+function RoomScene:createFollowButton()
+    if not self.m_btnFollowCard then
+        self.m_btnFollowCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx + 100, display.cy - 80)
+        self.m_btnFollowCard:onButtonClicked(function()
+            --todo
+        end)
+        self.m_btnFollowCard:setLocalZOrder(1000)
+        self:addChild(self.m_btnFollowCard)
+
+        local imgBtnInnerCircle = cc.ui.UIImage.new("btnOutCardInnerCircle.png")
+        imgBtnInnerCircle:setPosition(-32, -32)
+        self.m_btnFollowCard:addChild(imgBtnInnerCircle)
     end
 end
 
