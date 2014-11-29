@@ -79,10 +79,20 @@ function SelectCardDialog:createCards()
 	self:createNumCards()
 end
 
+function SelectCardDialog:checkHasSelectedCard()
+	if 0 == #self.m_roomMyCardUI.m_statusCards then
+		return false
+	end
+	return true
+end
+
 --创造 A
 function SelectCardDialog:createACards()
 	local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg"):onButtonClicked(
 		function()
+			if false == self:checkHasSelectedCard() then
+				return
+			end
 			self.m_roomMyCardUI:updateStatus()
 			self:setVisible(false)
 			EventDispatchController:dispatchEvent( {name = "kPlayerSelectCardEv", cardValue = 14} )
@@ -100,11 +110,12 @@ function SelectCardDialog:createNumCards()
 	for i = 10, 3, -1 do
   		local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg"):onButtonClicked(
 		function()
+			if false == self:checkHasSelectedCard() then
+				return
+			end
 			self.m_roomMyCardUI:updateStatus()
 			self:setVisible(false)
-			local value = i
-			-- print("<<<<<<<<<<<<<<<<<<<<<<<< " .. value)
-			EventDispatchController:dispatchEvent( {name = "kPlayerSelectCardEv", cardValue = value} )
+			EventDispatchController:dispatchEvent( {name = "kPlayerSelectCardEv", cardValue = i} )
 		end)
 		local labelCard = cc.ui.UILabel.new({UILabelType=1, text=tostring(i),font="futura-48.fnt", size=30})
 		labelCard:pos(-13, 0)
@@ -117,6 +128,9 @@ function SelectCardDialog:createNumCards()
 --创造数字牌 2
 	local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg"):onButtonClicked(
 	function()
+		if false == self:checkHasSelectedCard() then
+			return
+		end
 		self.m_roomMyCardUI:updateStatus()
 		self:setVisible(false)
 		EventDispatchController:dispatchEvent( {name = "kPlayerSelectCardEv", cardValue = 15} )
@@ -137,9 +151,11 @@ function SelectCardDialog:createLetterCards()
 	for k, v in ipairs(tCards) do
 		local btnCard = cc.ui.UIPushButton.new("selectCardBg.jpg"):onButtonClicked(
 		function()
+			if false == self:checkHasSelectedCard() then
+				return
+			end
 			self.m_roomMyCardUI:updateStatus()
 			self:setVisible(false)
-			-- print("<<<<<<<<<<<<<<<<<<<<<<<< " .. tValue[k])
 			EventDispatchController:dispatchEvent( {name = "kPlayerSelectCardEv", cardValue = tValue[k]} )
 		end)
 		local labelCard = cc.ui.UILabel.new({UILabelType=1, text=v, font="futura-48.fnt"})

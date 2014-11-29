@@ -29,6 +29,7 @@ CardPatternParam =
 function RoomMyCardUI:ctor(scene)	
 	self.m_ZOrder = 1000
 	self.m_scene = scene
+	self.m_lastCards = {}
 	self.m_lastCircleCards = {}
 	self.m_cards = {}
 	self.m_cardsOtherPlayer = {}
@@ -189,6 +190,7 @@ function RoomMyCardUI:showCardsAmountBySeat(seat, num)
 end
 
 function RoomMyCardUI:updateStatus()
+	self.m_lastCards = {}
 	local statusCards = {}
 	for k, v in pairs(self.m_statusCards) do
 		statusCards[#statusCards + 1] = v
@@ -203,6 +205,7 @@ function RoomMyCardUI:updateStatus()
 	for k, v in pairs(self.m_statusCards) do
 		local card = cc.ui.UIImage.new("cardPattern.png")
 		self.m_lastCircleCards[#self.m_lastCircleCards + 1] = card
+		self.m_lastCards[#self.m_lastCards + 1] = card
 		card:setLayoutSize(RoomMyCardUIParams.Width, RoomMyCardUIParams.Height)
 		card:setAnchorPoint(0, 0)
 		card:setLocalZOrder(self:newZOrder())
@@ -262,6 +265,7 @@ end
 
 function RoomMyCardUI:flyOutPlayerCards(seat, tCards)
 	local srcPosition = {}
+	self.m_lastCards = {}
 
 	if seat and 3 == seat then
 		srcPosition.x = 100
@@ -277,6 +281,7 @@ function RoomMyCardUI:flyOutPlayerCards(seat, tCards)
 	for k, v in ipairs(tCards) do
 		local card = cc.ui.UIImage.new("cardPattern.png")
 		self.m_lastCircleCards[#self.m_lastCircleCards + 1] = card
+		self.m_lastCards[#self.m_lastCards + 1] = card
 		card:setLayoutSize(CardPatternParam.Width, CardPatternParam.Height)
 		card:setPosition(srcPosition.x, srcPosition.y)
 		card:setAnchorPoint(0, 0)
@@ -311,6 +316,10 @@ function RoomMyCardUI:placePattern(gap)
 			transition.moveTo(v.innerCard, {x = startX + (k - 1) * gap, y = startY, time = 1})
 		end
 	end
+end
+
+function RoomMyCardUI:FlipLastCards()
+
 end
 
 return RoomMyCardUI
