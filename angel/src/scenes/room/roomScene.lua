@@ -19,6 +19,7 @@ function RoomScene:ctor()
     -- self:showCardPattern()
     self:schedulerProcess()
     self:registerEvent()
+    self:createFollowButton()
 end
 
 function RoomScene:getPlayerByMid(mid)
@@ -38,7 +39,6 @@ function RoomScene:init()
         )
 
     self:createOutCardButton()
-    self:createFollowButton()
 
     self:flyOutCardsBySeat(1,
     {{cardValue=3, cardType=3},
@@ -94,6 +94,9 @@ function RoomScene:createFollowButton()
         self.m_btnFollowCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx + 100, display.cy - 80)
         self.m_btnFollowCard:onButtonClicked(function()
             --todo
+            if self.m_cardUi then
+                self.m_cardUi:FlipLastCards()
+            end
         end)
         self.m_btnFollowCard:setLocalZOrder(1000)
         self:addChild(self.m_btnFollowCard)

@@ -26,6 +26,15 @@ CardPatternParam =
 	MaxX = 1280 - 300,
 }
 
+CardFlipParam =
+{
+	Width = 100,
+	Height = 100/0.693,
+	Gap = 50,
+	startY = display.cy,
+	Time = 1,
+}
+
 function RoomMyCardUI:ctor(scene)	
 	self.m_ZOrder = 1000
 	self.m_scene = scene
@@ -318,8 +327,38 @@ function RoomMyCardUI:placePattern(gap)
 	end
 end
 
-function RoomMyCardUI:FlipLastCards()
+function RoomMyCardUI:calculateStartX()
+	return (1280 - (#self.m_lastCards * CardFlipParam.Width + (#self.m_lastCards - 1) * CardFlipParam.Gap)) / 2
+end
 
+function RoomMyCardUI:FlipLastCards()
+	local startX = self:calculateStartX()
+
+	for k, v in ipairs(self.m_lastCards) do
+		transition.fadeOut(v, {time = CardFlipParam.Time})
+		transition.moveTo(v, {x = startX + (k - 1) * (CardFlipParam.Gap + CardFlipParam.Width), y = CardFlipParam.startY, time = CardFlipParam.Time})
+		local boundingSize = v:getBoundingBox()
+        local sx = CardFlipParam.Width / (boundingSize.width / v:getScaleX()) 
+        local sy = CardFlipParam.Height / (boundingSize.height / v:getScaleY())
+
+		transition.scaleTo(v, {
+			scaleX = sx, 
+			scaleY = sy,
+			time = 1})
+
+		if v.innerCard then
+			transition.fadeIn(v.innerCard, {time = 2})
+			transition.moveTo(v.innerCard, {x = startX + (k - 1) * (CardFlipParam.Gap + CardFlipParam.Width), y = CardFlipParam.startY, time = CardFlipParam.Time})
+			boundingSize = v.innerCard:getBoundingBox()
+        	sx = CardFlipParam.Width / (boundingSize.width / v.innerCard:getScaleX()) 
+        	sy = CardFlipParam.Height / (boundingSize.height / v.innerCard:getScaleY())
+
+			transition.scaleTo(v.innerCard, {
+				scaleX = sx, 
+				scaleY = sy,
+				time = 1})
+		end
+	end
 end
 
 return RoomMyCardUI
