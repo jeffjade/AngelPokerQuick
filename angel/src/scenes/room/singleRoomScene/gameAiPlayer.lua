@@ -7,6 +7,10 @@ GameAiPlayer = class("GameAiPlayer" , SinglePlayer)
 
 function GameAiPlayer:ctor(roomInfo)
 	self.mRoomInfo = roomInfo
+
+	self.mIsNewTurn = false
+
+	self:registerEvent()
 end
 
 function GameAiPlayer:dtor()
@@ -14,11 +18,10 @@ function GameAiPlayer:dtor()
 end
 
 function GameAiPlayer:registerEvent()
-
+	EventDispatchController:addEventListener( "kServerPlayNewTurnEv" ,     handler(self, self.onPlayNewTurnEvent))
 end
 
 function GameAiPlayer:setMoney()
-
 end
 
 function GameAiPlayer:getRoomInfo()
@@ -33,11 +36,13 @@ function GameAiPlayer:thinkHowGame(lastMid)
 	local betCards;
 
 	local myCards = self:getPlayerCards().cards;
-	if 1 or lastMid == 0 or lastMid == self.mMid then
+	if lastMid == 0 or lastMid == self.mMid or self.mIsNewTurn then
 		outCards , betCards = self:outFirstCard(myCards);
 	else
 		outCards , betCards = self:outLargeCard(myCards);
 	end
+
+	self.mIsNewTurn = false
 
 	print_lua_table(outCards)
 	-- _DebugLogWriteToFile_(outCards)
@@ -181,7 +186,6 @@ function GameAiPlayer:turnPlayCard()
 	EventDispatchController:dispatchEvent( {name = "kServerTurnPlayCardsEv" , 
 											mid = self.mMid ,
 											outIsTrue = outIsTrue} )
-
 end
 
 -- -----------------------------onEventCallBack-----------------------------
@@ -190,6 +194,10 @@ function GameAiPlayer:onPlayerOutCardEvent(mid)
 	if mid ~= self.mMid then
 
 	end
+end
+
+function GameAiPlayer:onPlayNewTurnEvent()
+	self.mIsNewTurn = true
 end
 -- -----------------------------onEventCallBack-----------------------------
 

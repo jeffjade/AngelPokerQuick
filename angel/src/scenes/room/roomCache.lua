@@ -54,7 +54,7 @@ function RoomCache:getNextPlayer()
 end
 
 function RoomCache:setLastPlayer(mid)
-	print("####setLastPlayer mid==="..mid)
+	print("RoomCache #### setLastPlayer mid==="..mid)
 	self.mLastPlayerMid = mid;
 end
 
@@ -77,6 +77,29 @@ end
 function RoomCache:getLastOutCards()
 	return self.mLastOutCards
 end
+
+-- 记录一轮中 所有玩家所出的牌相关的信息;
+function RoomCache:setRecordOutCardsInfo(playerOutCardsInfo)
+	if not self.mAllOutCardsInfo then
+		self.mAllOutCardsInfo = {}
+	end
+	table.insert(self.mAllOutCardsInfo , playerOutCardsInfo)
+end
+
+function RoomCache:getRecordOutCardsInfo()
+	return self.mAllOutCardsInfo
+end
+
+-- [新的一轮]重置所有玩家所出的牌相关的信息;
+function RoomCache:resetRecordOutCardsInfo()
+	self:setRecordLastOutCardsInfo( self.mAllOutCardsInfo )
+	self.mAllOutCardsInfo = {}
+end
+
+function RoomCache:setRecordLastOutCardsInfo( lastOutCardsInfo )
+	self.mAllLastOutCardsInfo = self.mAllOutCardsInfo
+end
+
 
 function RoomCache:getAllPlayerInfo()
 	return self.mPlayerMap or {};

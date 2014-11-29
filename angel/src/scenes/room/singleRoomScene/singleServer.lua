@@ -117,7 +117,7 @@ function SingleServer:playReady()
 	if isAllPlayerReadyFlag then
 		self.mRoomInfo.fuck = 999
 		print("???fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck)
-		self:dealCards()
+		self:dealCards() 
 	end
 end
 
@@ -216,7 +216,7 @@ function SingleServer:onPlayStartEvent(event)
 		firstPlayer:thinkHowGame()
 	end
 
-	QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 1 )
+	QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 3 )
 	--[[QueueUtils:getInstance():sychronizedDelayCommand(firstPlayer ,
 		firstPlayer.thinkHowGame ,1)
 	firstPlayer:thinkHowGame()]]
@@ -245,6 +245,13 @@ function SingleServer:onOutCardEvent(event)
 	-- print_lua_table(cards)
 
 	player:removeCard(cards.count , cards.outCards)
+ 
+	local playerOutCardsInfo = {}
+	playerOutCardsInfo.mid = mid 
+	playerOutCardsInfo.count = cards.count
+	playerOutCardsInfo.outCards = cards.outCards
+	playerOutCardsInfo.betCards = cards.betCards
+	self.mRoomInfo:setRecordOutCardsInfo(playerOutCardsInfo)
 
 	local gameIsOver = (player and player:getPlayerCards().count == 0) or false;
 	if gameIsOver then
@@ -258,29 +265,66 @@ function SingleServer:onOutCardEvent(event)
 	end
 end
 
+-- 控制将上一家所打的牌给翻出来-以验明真假-后做不同的处理;
 function SingleServer:onTurnCardEvent(event)
 	local mid = event.mid
+	local outIsTrue = event.outIsTrue
+ 	print("@@@@ onTurnCardEvent fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck.." mid = "..mid)
 
-	-- 控制将上一家所打的牌给翻出来-以验明真假;
-	print("@@@@ onTurnCardEvent fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck.." mid = "..mid)
+	-- 翻牌判断真假(真:翻牌者输-selfPlayer需要拿下本局所出的所有牌)
+	-- 翻牌判断真假(假:翻牌者赢-lastPlayer需要拿下本局所出的所有牌)
+	local allOutCardsInfo = self.mRoomInfo:getRecordOutCardsInfo()
+	local allPlayerOutCards = {}
+	for k , v in ipairs(allOutCardsInfo) do 
+		table.insert(allPlayerOutCards , v.outCards )
+	end
+	print_lua_table(allPlayerOutCards)
+
+	selfPlayer = self:findPlayerByMid( mid )
+	local lastMid = self.mRoomInfo:getLastPlayer();
+	local lastPlayer = self:findPlayerByMid( lastMid )
+
+	if outIsTrue then
+		-- 如果上一玩家手中没牌了(即最后一手牌)==>>gamePlayOver;
+		local lastPlayerCardsCount = lastPlayer:getPlayerCards().count
+		if lastPlayerCardsCount == 0 then 
+			self:gamePlayOver()
+		end
+		selfPlayer:receiveAllOutCards( allPlayerOutCards )
+		self.mRoomInfo:setNextPlayer( lastMid )
+
+		-- self.mRoomInfo:updateDirection(lastPlayer)
+	else
+		lastPlayer:receiveAllOutCards( allPlayerOutCards )
+		self.mRoomInfo:setNextPlayer( mid )
+
+		-- self.mRoomInfo:updateDirection(selfPlayer)
+	end
+	
+	--[[
+	local maxPlayerNum = SingleMaxPlayerNum
+	for i = 1 , maxPlayerNum do 
+		local player = self.mRoomInfo:findPlayerByDirection( i )
+		if player then
+			self.mRoomInfo:updateDirection(player)
+		end
+	end]]
+	
+	EventDispatchController:dispatchEvent({name = "kServerPlayNewTurnEv" })
+
+	self:nextPlayerPlay()
 end
 
 function SingleServer:onPlayNextEvent(event)
 	local mid = event.mid
-	if mid == self.mRoomInfo:getLastPlayer() then
-		-- 发送消息出去(告知这是新的一轮)
-		EventDispatcher.getInstance():dispatch(kServerPlayNewTurnEv);
-	else
-		-- do nothing
-	end
 
 	if mid ~= PhpInfo:getMid() then
-		print("!!!!!fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck)
+		print("!!!!! fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck)
 		local function onCallThinkHowGame()
+			print("=============onCallThinkHowGame==============mid =" .. mid)
 			local player = self.mRoomInfo:findPlayerByMid(mid);
 			player:thinkHowGame()
 		end
-
 		QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 1 )
 	end
 end
@@ -334,9 +378,9 @@ function SingleServer:isHaveRed3Card(Cards)
 	for k,v in pairs(Cards) do
 		if v["cardValue"] == 3 and v["cardType"] == 1 then
 			return true
-		end  
+		end
 	end
-end
+end 
 
 function SingleServer:isAllPlayerReadyFlag()
 	local maxPlayerNum = SingleMaxPlayerNum

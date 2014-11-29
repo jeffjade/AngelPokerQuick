@@ -54,6 +54,15 @@ function SinglePlayer:removeCard(count ,info)
 	self.mPlayerCards.count = new_count
 end
 
+function SinglePlayer:receiveAllOutCards( allPlayerOutCards )
+	for subK , subV in ipairs( allPlayerOutCards ) do 
+		for k , v in ipairs(subV) do 
+			table.insert( self.mPlayerCards.cards , v )
+		end 
+	end
+	self.mPlayerCards.count = #self.mPlayerCards.cards
+end
+
 function SinglePlayer:outPlayCard()
 	
 end
