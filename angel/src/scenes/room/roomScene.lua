@@ -7,7 +7,6 @@ local RoomScene = class("RoomScene", function()
 end)
 
 function RoomScene:ctor()
-    -- 根节点
     self.rootScene = cc.uiloader:load("wiget_main_scene.json")
 
     self:addPersonFirst()
@@ -17,7 +16,7 @@ function RoomScene:ctor()
     self:addChild(self.rootScene)
     self:createSelfLoadingBar()
     self:init()
-    self:showCardPattern()
+    -- self:showCardPattern()
     self:schedulerProcess()
     self:registerEvent()
 end
@@ -74,26 +73,27 @@ function RoomScene:showSelectDialog()
 end
 
 function RoomScene:createOutCardButton()
-    self.m_btnOutCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx, display.cy - 80)
-    self.m_btnOutCard:onButtonClicked(function()
-        self:showSelectDialog()
-    end)
-    self:addChild(self.m_btnOutCard)
+    if not self.m_btnOutCard then
+        self.m_btnOutCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx, display.cy - 80)
+        self.m_btnOutCard:onButtonClicked(function()
+            self:showSelectDialog()
+        end)
+        self:addChild(self.m_btnOutCard)
 
-    local imgBtnInnerCircle = cc.ui.UIImage.new("btnOutCardInnerCircle.png")
-    imgBtnInnerCircle:setPosition(-32, -32)
-    self.m_btnOutCard:addChild(imgBtnInnerCircle)
+        local imgBtnInnerCircle = cc.ui.UIImage.new("btnOutCardInnerCircle.png")
+        imgBtnInnerCircle:setPosition(-32, -32)
+        self.m_btnOutCard:addChild(imgBtnInnerCircle)
+    end
 end
 
 function RoomScene:showMyCards(tCards)
-	--Debug 加载牌
+	--Debug
     self.m_cardUi = require(GameRoomPath .. "roomMyCardUI").new(self)
     self.m_cardUi:createCards(tCards)
     self.m_cardUi:placeCard()
     self:addChild(self.m_cardUi)
 end
 
--- 加载人物一
 function RoomScene:addPersonFirst()
     local widgetPerson = cc.uiloader:seekNodeByName(self.rootScene, "widget_first_person")
 
@@ -104,7 +104,6 @@ function RoomScene:addPersonFirst()
     widgetPerson:addChild(self.m_widgetFirstPerson)
 end                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
 
---加载人物二
 function RoomScene:addPersonSecond()
     local widgetPerson = cc.uiloader:seekNodeByName(self.rootScene, "widget_second_person")
 
@@ -115,7 +114,6 @@ function RoomScene:addPersonSecond()
     widgetPerson:addChild(self.m_widgetSecondPerson)
 end
 
---加载人物三
 function RoomScene:addPersonThird()
     local widgetPerson = cc.uiloader:seekNodeByName(self.rootScene, "widget_third_person")
 
@@ -126,14 +124,12 @@ function RoomScene:addPersonThird()
     widgetPerson:addChild(self.m_widgetThirdPerson)
 end
 
---加载自己
 function RoomScene:addSelf()
     local widgetPerson = cc.uiloader:seekNodeByName(self.rootScene, "widget_self_person")
     local widgetRootPersonScene =  cc.uiloader:load("widget_self.json") 
     widgetPerson:addChild(widgetRootPersonScene)
 end
 
---创建自己的进度条
 --cc.rect(options.capInsetsX, options.capInsetsY,options.capInsetsWidth, options.capInsetsHeight)
 function RoomScene:createSelfLoadingBar() 
     self.m_selfLoadingBar = cc.ui.UILoadingBar.new({

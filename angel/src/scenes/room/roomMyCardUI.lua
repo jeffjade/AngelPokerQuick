@@ -4,18 +4,32 @@ local RoomMyCardUI = class("RoomMyCardUI",  function()
 	return display.newNode()
 end)
 
-local g_cardWidth = 100
+local g_cardWidth = 20
 
 local RoomMyCardUIParams = 
 {
-	Gap = 43,                  		--间距
-	Width = g_cardWidth,            --牌宽
-	Height = g_cardWidth/0.693 ,    --牌高
-	ScaleFactor = 0.25,             --缩放因子
+	Gap = 43,                  		
+	Width = 100,            
+	Height = 100/0.693 ,    
+	ScaleFactor = 0.25,             
+	TimeFlyOut = 1,
+}
+
+CardPatternParam = 
+{
+	Width = 50,
+	Height = 75,
+	Gap = 30,
+	EndX = display.cx,
+	EndY = display.cy,
+	MinimumX = 300,
+	MaxX = 1280 - 300,
 }
 
 function RoomMyCardUI:ctor(scene)	
+	self.m_ZOrder = 1000
 	self.m_scene = scene
+	self.m_lastCircleCards = {}
 	self.m_cards = {}
 	self.m_cardsOtherPlayer = {}
 	self.m_statusCards = {}
@@ -41,49 +55,12 @@ function RoomMyCardUI:onPlayerSelectCardEvent(event)
 		card.cardByte = CardUtil.getCardByteByValueType(card.cardValue , card.cardType)
 		cards[#cards + 1] = card
 	end
+	self.m_statusCards = {}
 	player:setOutCards(#cards, {num = #cards, cardValue = event.cardValue}, cards)
-
-	-- print_lua_table( cards )
 	player:removeCard(#cards , cards)
-
-	EventDispatchController:dispatchEvent( {name = "SINGLE_SERVER_OUT_CARDS", mid = PhpInfo:getMid() } )
+	-- print_lua_table( cards )
+	EventDispatchController:dispatchEvent({name = "SINGLE_SERVER_OUT_CARDS", mid = PhpInfo:getMid()})
 	EventDispatchController:dispatchEvent({name = "kServerPlayerOutCardsEv" , mid = PhpInfo:getMid() ,outCards = cards})
-end
-
-function RoomMyCardUI:updateStatus()
-	local statusCards = {}
-	for k, v in pairs(self.m_statusCards) do
-		statusCards[#statusCards + 1] = v
-	end
-
-	self.m_statusCards = statusCards
-
-	table.sort(self.m_statusCards, function(a, b)
-			return b.m_cardValue > a.m_cardValue
-		end)
-
-	for k,v in pairs(self.m_statusCards) do
-		transition.moveTo(v, {x = display.cx + (k - 1) * 30, y = display.cy-50, time = 0.5})
-		transition.scaleTo(v, {scaleX = 0.2, scaleY = 0.2, time = 0.2})
-	end
-
-	for k, v in pairs(self.m_statusCards) do
-		for t, q in pairs(self.m_cards) do
-			if q == v then
-				self.m_cards[t] = nil
-			end
-		end
-	end
-
-	local cards = {}
-	for k, v in pairs(self.m_cards) do
-		cards[#cards + 1] = v
-		print("*************** " .. v.m_cardType .. " " .. v.m_cardValue)
-	end
-
-	self.m_cards = cards
-
-	self:replaceCards()
 end
 
 function RoomMyCardUI:replaceCards()
@@ -98,7 +75,7 @@ function RoomMyCardUI:replaceCards()
 	for k = 1, self.m_numUpperCards do
 		local v = self.m_cards[k]
 		v:setPosition(startPointX + (k - 1) * RoomMyCardUIParams.Gap, 90)
-		v:setScale(RoomMyCardUIParams.ScaleFactor)
+		v:setLayoutSize(RoomMyCardUIParams.Width, RoomMyCardUIParams.Height)
 		v:setAnchorPoint(0, 0)
 	end
 
@@ -116,7 +93,7 @@ function RoomMyCardUI:replaceCards()
 		local v = self.m_cards[k]
 		v:setPosition(startPointX + (k - 1 - self.m_numUpperCards) 
 				* RoomMyCardUIParams.Gap, 15)
-		v:setScale(RoomMyCardUIParams.ScaleFactor)
+		v:setLayoutSize(RoomMyCardUIParams.Width, RoomMyCardUIParams.Height)
 		v:setAnchorPoint(0, 0)
 	end
 end
@@ -139,7 +116,6 @@ function RoomMyCardUI:createCards(tCards)
 	self:calUpperAndLowerCardsNum()
 end
 
---排列上层
 function RoomMyCardUI:placeUpperLevel()
 	local centerPointx = (1280 - 110) / 2
 	local cardLength = self.m_numUpperCards * RoomMyCardUIParams.Gap + (RoomMyCardUIParams.Width - RoomMyCardUIParams.Gap)
@@ -148,13 +124,13 @@ function RoomMyCardUI:placeUpperLevel()
 	for k = 1, self.m_numUpperCards do
 		local v = self.m_cards[k]
 		v:setPosition(startPointX + (k - 1) * RoomMyCardUIParams.Gap, 90)
-		v:setScale(RoomMyCardUIParams.ScaleFactor)
+		v:setLayoutSize(RoomMyCardUIParams.Width, RoomMyCardUIParams.Height)
 		v:setAnchorPoint(0, 0)
 		self:addChild(v)
 	end
 end
 
---排列下层
+
 function RoomMyCardUI:placeLowerLevel()
 	local centerPointx = (1280 - 110) / 2
 	local cardLength = self.m_numLowerCards * RoomMyCardUIParams.Gap + (RoomMyCardUIParams.Width - RoomMyCardUIParams.Gap)
@@ -169,41 +145,17 @@ function RoomMyCardUI:placeLowerLevel()
 		local v = self.m_cards[k]
 		v:setPosition(startPointX + (k - 1 - self.m_numUpperCards) 
 				* RoomMyCardUIParams.Gap, 15)
-		v:setScale(RoomMyCardUIParams.ScaleFactor)
+		v:setLayoutSize(RoomMyCardUIParams.Width, RoomMyCardUIParams.Height)
 		v:setAnchorPoint(0, 0)
 		self:addChild(v)
 	end
 end
 
---开始编写排列 25 张下层牌
 function RoomMyCardUI:placeCard()
 	self:placeUpperLevel()
 	self:placeLowerLevel()
 end
 
---0、1、2、3 号位出牌飞出
-function RoomMyCardUI:flyOutPlayerCards(seatSequence, tCards)
-	for k, v in ipairs(tCards) do
-		local card = require(GameRoomPath .. "card").new(v.cardValue, v.cardType, self)
-		self.m_cardsOtherPlayer[#self.m_cardsOtherPlayer + 1] = card
-		if seatSequence and 3 == seatSequence then
-			card:setPosition(100, 300)
-		elseif seatSequence and 2 == seatSequence then
-			card:setPosition(400, 600)
-		elseif seatSequence and 1 == seatSequence then
-			card:setPosition(800, 600)
-		end
-
-		card:setScale(0.2)
-		card:setAnchorPoint(0, 0)
-		card:getCard():setButtonEnabled(false)
-		transition.moveTo(card, {x = display.cx +  k * 30, y = display.cy-50, time = 1})
-
-		self:addChild(card)
-	end
-end
-
---0、1、2、3 号剩余数量牌展示
 function RoomMyCardUI:showCardsAmountBySeat(seat, num)
 	if 0 == seat then
 		if not self.m_labelCardsMe then
@@ -233,6 +185,131 @@ function RoomMyCardUI:showCardsAmountBySeat(seat, num)
 			self:addChild(self.m_labelCardsSeatThree)
 		end
 		self.m_labelCardsSeatThree:setString(num)
+	end
+end
+
+function RoomMyCardUI:updateStatus()
+	local statusCards = {}
+	for k, v in pairs(self.m_statusCards) do
+		statusCards[#statusCards + 1] = v
+	end
+
+	self.m_statusCards = statusCards
+
+	table.sort(self.m_statusCards, function(a, b)
+			return b.m_cardValue > a.m_cardValue
+		end)
+
+	for k, v in pairs(self.m_statusCards) do
+		local card = cc.ui.UIImage.new("cardPattern.png")
+		self.m_lastCircleCards[#self.m_lastCircleCards + 1] = card
+		card:setLayoutSize(RoomMyCardUIParams.Width, RoomMyCardUIParams.Height)
+		card:setAnchorPoint(0, 0)
+		card:setLocalZOrder(self:newZOrder())
+
+		local boundingSize = card:getBoundingBox()
+        local sx = CardPatternParam.Width / (boundingSize.width / card:getScaleX()) 
+        local sy = CardPatternParam.Height / (boundingSize.height / card:getScaleY())
+
+		transition.scaleTo(card, {
+			scaleX = sx, 
+			scaleY = sy,
+			time = 1})
+		transition.fadeIn(card, {time = 1})
+		card:setOpacity(0)
+		transition.fadeTo(card, {opacity = 255, time = 1.5})
+
+		boundingSize = v:getBoundingBox()
+        sx = CardPatternParam.Width / (boundingSize.width / v:getScaleX()) 
+        sy = CardPatternParam.Height / (boundingSize.height / v:getScaleY())
+
+		transition.scaleTo(v, {
+			scaleX = sx, 
+			scaleY = sy,
+			time = 1})
+		transition.fadeOut(v, {time = 0.1})
+
+		card:setPosition(v:getPosition())
+		card.innerCard = v
+		self:addChild(card)
+	end
+
+	self:placePattern(self:calculateGap())
+
+	for k, v in pairs(self.m_statusCards) do
+		for t, q in pairs(self.m_cards) do
+			if q == v then
+				self.m_cards[t] = nil
+			end
+		end
+	end
+
+	local cards = {}
+	for k, v in pairs(self.m_cards) do
+		cards[#cards + 1] = v
+		print("*************** " .. v.m_cardType .. " " .. v.m_cardValue)
+	end
+
+	self.m_cards = cards
+
+	self:replaceCards()
+end
+
+function RoomMyCardUI:newZOrder()
+	self.m_ZOrder = self.m_ZOrder + 1
+ 	return self.m_ZOrder
+end
+
+function RoomMyCardUI:flyOutPlayerCards(seat, tCards)
+	local srcPosition = {}
+
+	if seat and 3 == seat then
+		srcPosition.x = 100
+		srcPosition.y = 300
+	elseif seat and 2 == seat then
+		srcPosition.x = 400
+		srcPosition.y = 600
+	elseif seat and 1 == seat then
+		srcPosition.x = 800
+		srcPosition.y = 600
+	end
+
+	for k, v in ipairs(tCards) do
+		local card = cc.ui.UIImage.new("cardPattern.png")
+		self.m_lastCircleCards[#self.m_lastCircleCards + 1] = card
+		card:setLayoutSize(CardPatternParam.Width, CardPatternParam.Height)
+		card:setPosition(srcPosition.x, srcPosition.y)
+		card:setAnchorPoint(0, 0)
+		card:setLocalZOrder(self:newZOrder())
+		self:addChild(card)
+	end
+
+	self:placePattern(self:calculateGap())
+end
+
+function RoomMyCardUI:calculateGap()
+	local gap = CardPatternParam.Gap
+	local length = #self.m_lastCircleCards * CardPatternParam.Gap 
+				+ (CardPatternParam.Width - CardPatternParam.Gap)
+	local startX = (display.cx - length/2)
+	if startX < CardPatternParam.MinimumX and #self.m_lastCircleCards > 1 then
+		gap = (CardPatternParam.MaxX - CardPatternParam.MinimumX - CardPatternParam.Width)
+			/ (#self.m_lastCircleCards - 1)
+	end
+	return gap
+end
+
+function RoomMyCardUI:placePattern(gap)
+	local length = #self.m_lastCircleCards * gap 
+				+ (CardPatternParam.Width - gap)
+	local startX = (display.cx - length/2)
+	local startY = CardPatternParam.EndY - CardPatternParam.Height
+
+	for k, v in ipairs(self.m_lastCircleCards) do
+		transition.moveTo(v, {x = startX + (k - 1) * gap, y = startY, time = 1})
+		if v.innerCard then
+			transition.moveTo(v.innerCard, {x = startX + (k - 1) * gap, y = startY, time = 1})
+		end
 	end
 end
 

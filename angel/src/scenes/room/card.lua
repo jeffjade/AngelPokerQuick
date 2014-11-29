@@ -15,7 +15,7 @@ local CardType =
 }
 
 local Card = class("Card", function()
-		return display.newNode()
+		return cc.ui.UIImage.new()
 	end)
 
 function Card:ctor(cardValue, cardType, roomMycardUI)
@@ -72,86 +72,48 @@ end
 
 function Card:createCardF()
 	display.addSpriteFrames("card_f.plist", "card_f.png")
-	strNamePic = "#f" .. self.m_cardValue .. ".png"
-	self.m_card = cc.ui.UIPushButton.new(strNamePic)
-	self.m_card:setAnchorPoint(0, 0)
-	self.m_card:onButtonClicked(
-		function()
-			local x, y = self.m_card:getPosition()
-			if self.m_bSelected then
-				self.m_card:setPosition(x, y - 30)
-			else
-				self.m_card:setPosition(x, y + 30)
-			end
-			self.m_bSelected = not self.m_bSelected
-
-			self:updateCardStatus()
-		end)
-	self:addChild(self.m_card)
+	strNamePic = "f" .. self.m_cardValue .. ".png"
+	self:set(strNamePic)
 end
 
 function Card:createCardM()
 	display.addSpriteFrames("card_m.plist", "card_m.png")
-	strNamePic = "#m" .. self.m_cardValue .. ".png"  
-	self.m_card = cc.ui.UIPushButton.new(strNamePic)
-	self.m_card:setAnchorPoint(0, 0)
-	self.m_card:onButtonClicked(
-		function()
-			local x, y = self.m_card:getPosition()
-			if self.m_bSelected then
-				self.m_card:setPosition(x, y - 30)
-			else
-				self.m_card:setPosition(x, y + 30)
-			end
-			self.m_bSelected = not self.m_bSelected
-
-			self:updateCardStatus()
-		end)
-	self:addChild(self.m_card)
+	strNamePic = "m" .. self.m_cardValue .. ".png"  
+	self:set(strNamePic)
 end
 
 function Card:createCardH()
 	display.addSpriteFrames("card_h.plist", "card_h.png")
-	strNamePic = "#h" .. self.m_cardValue .. ".png"
-	self.m_card = cc.ui.UIPushButton.new(strNamePic)
-	self.m_card:setAnchorPoint(0, 0)
-	self.m_card:onButtonClicked(
-		function()
-			local x, y = self.m_card:getPosition()
-			if self.m_bSelected then
-				self.m_card:setPosition(x, y - 30)
-			else
-				self.m_card:setPosition(x, y + 30)
-			end
-			self.m_bSelected = not self.m_bSelected
-
-			self:updateCardStatus()
-		end)
-	self:addChild(self.m_card)
+	strNamePic = "h" .. self.m_cardValue .. ".png"
+	self:set(strNamePic)
 end
 
 function Card:createCardR()
 	display.addSpriteFrames("card_r.plist", "card_r.png")
-	strNamePic = "#r" .. self.m_cardValue .. ".png"
-	self.m_card = cc.ui.UIPushButton.new(strNamePic)
-	self.m_card:setAnchorPoint(0, 0)
-	self.m_card:onButtonClicked(
-		function()
-			local x, y = self.m_card:getPosition()
+	strNamePic = "r" .. self.m_cardValue .. ".png"
+	self:set(strNamePic)
+end
+
+function Card:set(strNamePic)
+	local frame = display.newSpriteFrame(strNamePic)
+
+	self:setSpriteFrame(frame) 
+	self:setTouchEnabled(true)
+	self:setTouchSwallowEnabled(true)
+	self:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event)
+        if event.name == "ended" then
+    		local x, y = self:getPosition()
 			if self.m_bSelected then
-				self.m_card:setPosition(x, y - 30)
+				self:setPosition(x, y - 30)
 			else
-				self.m_card:setPosition(x, y + 30)
+				self:setPosition(x, y + 30)
 			end
 			self.m_bSelected = not self.m_bSelected
 
 			self:updateCardStatus()
-		end)
-	self:addChild(self.m_card)
-end
-
-function Card:getCard()
-	return self.m_card
+        end
+        return true
+    end)
 end
 
 return Card
