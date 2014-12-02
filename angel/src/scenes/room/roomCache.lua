@@ -91,15 +91,14 @@ function RoomCache:getRecordOutCardsInfo()
 end
 
 -- [新的一轮]重置所有玩家所出的牌相关的信息;
-function RoomCache:resetRecordOutCardsInfo()
+function RoomCache:clearRecordOutCardsInfo()
 	self:setRecordLastOutCardsInfo( self.mAllOutCardsInfo )
-	self.mAllOutCardsInfo = {}
+	self.mAllOutCardsInfo = nil
 end
 
 function RoomCache:setRecordLastOutCardsInfo( lastOutCardsInfo )
 	self.mAllLastOutCardsInfo = self.mAllOutCardsInfo
 end
-
 
 function RoomCache:getAllPlayerInfo()
 	return self.mPlayerMap or {};

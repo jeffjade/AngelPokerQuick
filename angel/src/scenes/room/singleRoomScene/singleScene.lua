@@ -65,6 +65,14 @@ end
 function SingleScene:onCleanup()
 end
 
+function SingleScene:updatePlayerLastCountByMid(mid)
+    local player = self.mRoomInfo:findPlayerByMid(mid)
+    local seat = player:getSeat()
+    local playerCards = player:getPlayerCards()
+    local leftCount = playerCards.count
+    self:showPlayerLeftCardCount(seat , leftCount )
+end
+
 -- ---------------------------------onEventCallBack-----------------------------------------------
 function SingleScene:onPlayStartEvent(event)
     if event.mid == PhpInfo:getMid() then
@@ -78,11 +86,7 @@ function SingleScene:onGameDealCardsEvent(event)
 		-- print_lua_table(event.playerCards)
 		self:showMyCards(event.playerCards)
 	end
-    local player = self.mRoomInfo:findPlayerByMid(mid)
-    local seat = player:getSeat()
-    local playerCards = player:getPlayerCards()
-    local leftCount = playerCards.count
-    self:showPlayerLeftCardCount(seat , leftCount )
+    self:updatePlayerLastCountByMid(mid)
 end
 
 function SingleScene:onPlayNextEvent(event)
@@ -98,9 +102,8 @@ function SingleScene:onPlayOutCardsEvent(event)
     local seat = player:getSeat()
     local playerCards = player:getPlayerCards()
     local leftCount = playerCards.count
-    print("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo count" .. leftCount)
+    print("ooooooooooooooo----onPlayOutCardsEvent----oooooooooooo " .. seat .. " leftCount= " .. leftCount)
     if mid ~= PhpInfo:getMid() then
-        print("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo " .. seat)
         self:flyOutCardsBySeat(seat , outCards)
         self:showPlayerLeftCardCount(seat , leftCount )
     else

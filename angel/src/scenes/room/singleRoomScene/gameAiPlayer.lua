@@ -175,17 +175,8 @@ function GameAiPlayer:outPlayCard()
 end
 
 function GameAiPlayer:turnPlayCard()
-	local lastCards = self.mRoomInfo:getLastOutCards()
-	local outCards, betCards = lastCards.outCards , lastCards.betCards
-
-	local outIsTrue = CardUtil.judgePlayIsTrue(outCards, betCards)
-
-	print("GameAiPlayer:turnPlayCard()  ====outIsTrue ="..(outIsTrue and "true" or "false"))
-	print("GameAiPlayer:turnPlayCard()  ==========mid ="..self.mMid)
-
-	EventDispatchController:dispatchEvent( {name = "kServerTurnPlayCardsEv" , 
-											mid = self.mMid ,
-											outIsTrue = outIsTrue} )
+	EventDispatchController:dispatchEvent( {name = "kServerTurnPlayCardsEv", 
+											mid = self.mMid ,} )
 end
 
 -- -----------------------------onEventCallBack-----------------------------

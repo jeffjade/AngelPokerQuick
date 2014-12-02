@@ -20,3 +20,6 @@ require("gameData/eventConstants")
 
 -- ------------------------------sockets-------------------------------------
 require("sockets/socketManager")
+
+-- ------------------------------Animation-----------------------------------
+require("animation/toast")

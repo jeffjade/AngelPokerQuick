@@ -268,7 +268,18 @@ end
 -- 控制将上一家所打的牌给翻出来-以验明真假-后做不同的处理;
 function SingleServer:onTurnCardEvent(event)
 	local mid = event.mid
-	local outIsTrue = event.outIsTrue
+
+	local lastCards = self.mRoomInfo:getLastOutCards()
+	local outCards, betCards = lastCards.outCards , lastCards.betCards
+
+	local outIsTrue = CardUtil.judgePlayIsTrue(outCards, betCards)
+
+	local tipStr = string.format("Mid=%d玩家翻牌,结果是:%s",mid, (outIsTrue and "true" or "false") )
+	Toast.getInstance(self.mRoomScene):showText( tipStr )
+
+	print("SingleServer:onTurnCardEvent()  ====outIsTrue ="..(outIsTrue and "true" or "false"))
+	print("SingleServer:onTurnCardEvent()  ==========mid =".. mid)
+
  	print("@@@@ onTurnCardEvent fuck=======self.mRoomInfo.fuck = "..self.mRoomInfo.fuck.." mid = "..mid)
 
 	-- 翻牌判断真假(真:翻牌者输-selfPlayer需要拿下本局所出的所有牌)
@@ -278,6 +289,8 @@ function SingleServer:onTurnCardEvent(event)
 	for k , v in ipairs(allOutCardsInfo) do 
 		table.insert(allPlayerOutCards , v.outCards )
 	end
+
+	print("all allPlayerOutCards player out cards Is :\n")
 	print_lua_table(allPlayerOutCards)
 
 	selfPlayer = self:findPlayerByMid( mid )
@@ -291,14 +304,17 @@ function SingleServer:onTurnCardEvent(event)
 			self:gamePlayOver()
 		end
 		selfPlayer:receiveAllOutCards( allPlayerOutCards )
-		self.mRoomInfo:setNextPlayer( lastMid )
+		self.mRoomInfo:clearRecordOutCardsInfo()
 
-		-- self.mRoomInfo:updateDirection(lastPlayer)
+		self.mRoomInfo:setNextPlayer( lastMid )
+		self.mRoomScene:updatePlayerLastCountByMid( mid )
 	else
 		lastPlayer:receiveAllOutCards( allPlayerOutCards )
-		self.mRoomInfo:setNextPlayer( mid )
+		self.mRoomInfo:clearRecordOutCardsInfo()
 
+		self.mRoomInfo:setNextPlayer( mid )
 		-- self.mRoomInfo:updateDirection(selfPlayer)
+		self.mRoomScene:updatePlayerLastCountByMid( lastMid )
 	end
 	
 	--[[
@@ -312,7 +328,10 @@ function SingleServer:onTurnCardEvent(event)
 	
 	EventDispatchController:dispatchEvent({name = "kServerPlayNewTurnEv" })
 
-	self:nextPlayerPlay()
+	local function onCallThinkHowGame()
+		self:nextPlayerPlay()
+	end
+	QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 3 )
 end
 
 function SingleServer:onPlayNextEvent(event)

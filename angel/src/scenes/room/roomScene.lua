@@ -96,6 +96,9 @@ function RoomScene:createFollowButton()
             --todo
             if self.m_cardUi then
                 self.m_cardUi:FlipLastCards()
+
+                EventDispatchController:dispatchEvent( { name = "kServerTurnPlayCardsEv", 
+                                                         mid = PhpInfo:getMid() } )
             end
         end)
         self.m_btnFollowCard:setLocalZOrder(1000)
