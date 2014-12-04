@@ -268,6 +268,7 @@ end
 -- 控制将上一家所打的牌给翻出来-以验明真假-后做不同的处理;
 function SingleServer:onTurnCardEvent(event)
 	local mid = event.mid
+	local seat = 0
 
 	local lastCards = self.mRoomInfo:getLastOutCards()
 	local outCards, betCards = lastCards.outCards , lastCards.betCards
@@ -303,6 +304,11 @@ function SingleServer:onTurnCardEvent(event)
 		if lastPlayerCardsCount == 0 then 
 			self:gamePlayOver()
 		end
+
+    	seat = selfPlayer:getSeat()
+    	EventDispatchController:dispatchEvent( {name = "kPlayerFlipCardsEv", 
+											seat = seat} )
+
 		selfPlayer:receiveAllOutCards( allPlayerOutCards )
 		self.mRoomInfo:clearRecordOutCardsInfo()
 
@@ -310,6 +316,11 @@ function SingleServer:onTurnCardEvent(event)
 		self.mRoomScene:updatePlayerLastCountByMid( mid )
 	else
 		lastPlayer:receiveAllOutCards( allPlayerOutCards )
+
+    	seat = lastPlayer:getSeat()
+    	EventDispatchController:dispatchEvent( {name = "kPlayerFlipCardsEv", 
+											seat = seat} )
+
 		self.mRoomInfo:clearRecordOutCardsInfo()
 
 		self.mRoomInfo:setNextPlayer( mid )
@@ -331,7 +342,7 @@ function SingleServer:onTurnCardEvent(event)
 	local function onCallThinkHowGame()
 		self:nextPlayerPlay()
 	end
-	QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 3 )
+	QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 5.5 )
 end
 
 function SingleServer:onPlayNextEvent(event)

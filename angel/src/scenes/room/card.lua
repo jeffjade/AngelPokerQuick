@@ -28,6 +28,14 @@ function Card:ctor(cardValue, cardType, roomMycardUI)
 	self:createCard()
 end
 
+function Card:getCardValue()
+	return self.m_cardValue
+end
+
+function Card:getCardType()
+	return self.m_cardType
+end
+
 --根据牌型、牌值 返回牌精灵控件
 function Card:createCard()
 	if CardType.Fang == self.m_cardType then
@@ -114,6 +122,10 @@ function Card:set(strNamePic)
         end
         return true
     end)
+end
+
+function Card:setSelectStatus(status)
+	self.m_bSelected = status
 end
 
 return Card

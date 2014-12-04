@@ -35,13 +35,17 @@ CardFlipParam =
 	Time = 1,
 }
 
+CardScalToPatternParam = 
+{
+	time = 2
+}
+
 function RoomMyCardUI:ctor(scene)	
 	self.m_ZOrder = 1000
 	self.m_scene = scene
 	self.m_lastCards = {}
 	self.m_lastCircleCards = {}
 	self.m_cards = {}
-	self.m_cardsOtherPlayer = {}
 	self.m_statusCards = {}
 	self.m_numCards = 0
 	self.m_numUpperCards = 0
@@ -87,6 +91,8 @@ function RoomMyCardUI:replaceCards()
 		v:setPosition(startPointX + (k - 1) * RoomMyCardUIParams.Gap, 90)
 		v:setLayoutSize(RoomMyCardUIParams.Width, RoomMyCardUIParams.Height)
 		v:setAnchorPoint(0, 0)
+		v:setLocalZOrder(self:newZOrder())
+		v:setSelectStatus(false)
 	end
 
 	--lower cards
@@ -105,6 +111,8 @@ function RoomMyCardUI:replaceCards()
 				* RoomMyCardUIParams.Gap, 15)
 		v:setLayoutSize(RoomMyCardUIParams.Width, RoomMyCardUIParams.Height)
 		v:setAnchorPoint(0, 0)
+		v:setLocalZOrder(self:newZOrder())
+		v:setSelectStatus(false)
 	end
 end
 
@@ -113,6 +121,7 @@ function RoomMyCardUI:calUpperAndLowerCardsNum()
 		self.m_numUpperCards = self.m_numCards - 25
 		self.m_numLowerCards = 25
 	else
+		self.m_numUpperCards = 0
 		self.m_numLowerCards = self.m_numCards
 	end
 end
@@ -295,6 +304,13 @@ function RoomMyCardUI:flyOutPlayerCards(seat, tCards)
 		card:setPosition(srcPosition.x, srcPosition.y)
 		card:setAnchorPoint(0, 0)
 		card:setLocalZOrder(self:newZOrder())
+		local innerCard = require(GameRoomPath .. "card").new(v.cardValue, v.cardType, self)
+		innerCard:setTouchEnabled(false)
+		innerCard:setOpacity(0)
+		innerCard:setPosition(srcPosition.x, srcPosition.y)
+		innerCard:setLayoutSize(CardPatternParam.Width, CardPatternParam.Height)
+		card.innerCard = innerCard
+		self:addChild(innerCard)
 		self:addChild(card)
 	end
 
@@ -331,10 +347,14 @@ function RoomMyCardUI:calculateStartX()
 	return (1280 - (#self.m_lastCards * CardFlipParam.Width + (#self.m_lastCards - 1) * CardFlipParam.Gap)) / 2
 end
 
-function RoomMyCardUI:FlipLastCards()
+function RoomMyCardUI:flipLastCards(seat)
 	local startX = self:calculateStartX()
 
 	for k, v in ipairs(self.m_lastCards) do
+		local x = v:getPositionX()
+		local y = v:getPositionY()
+       	v.posPattern = {x, y}
+
 		transition.fadeOut(v, {time = CardFlipParam.Time})
 		transition.moveTo(v, {x = startX + (k - 1) * (CardFlipParam.Gap + CardFlipParam.Width), y = CardFlipParam.startY, time = CardFlipParam.Time})
 		local boundingSize = v:getBoundingBox()
@@ -347,6 +367,9 @@ function RoomMyCardUI:FlipLastCards()
 			time = 1})
 
 		if v.innerCard then
+			local x, y = v.innerCard:getPosition()
+       		v.innerCard.posPattern = {x, y}
+
 			transition.fadeIn(v.innerCard, {time = 2})
 			transition.moveTo(v.innerCard, {x = startX + (k - 1) * (CardFlipParam.Gap + CardFlipParam.Width), y = CardFlipParam.startY, time = CardFlipParam.Time})
 			boundingSize = v.innerCard:getBoundingBox()
@@ -358,6 +381,136 @@ function RoomMyCardUI:FlipLastCards()
 				scaleY = sy,
 				time = 1})
 		end
+	end
+
+	--恢复
+	self:scaleToPosPattern()
+	self:flyBackCardsBySeat(seat)
+end
+
+function RoomMyCardUI:scaleToPosPattern()
+	for k, v in ipairs(self.m_lastCards) do
+		local boundingSize = v:getBoundingBox()
+        local sx = CardPatternParam.Width / (boundingSize.width / v:getScaleX()) 
+        local sy = CardPatternParam.Height / (boundingSize.height / v:getScaleY())
+
+       	transition.scaleTo(v, {
+		scaleX = sx, 
+		scaleY = sy,
+		time = 1,
+		delay = CardScalToPatternParam.time})
+
+		transition.moveTo(v, {x = v.posPattern[1], y = v.posPattern[2], time = CardFlipParam.Time, delay = CardScalToPatternParam.time})
+
+		--todo:渐显
+		transition.fadeIn(v, {time = 2, delay = CardScalToPatternParam.time})
+		if v.innerCard then
+			local boundingSize = v.innerCard:getBoundingBox()
+        	local sx = CardPatternParam.Width / (boundingSize.width / v.innerCard:getScaleX()) 
+        	local sy = CardPatternParam.Height / (boundingSize.height / v.innerCard:getScaleY())
+
+       		transition.scaleTo(v.innerCard, {
+			scaleX = sx, 
+			scaleY = sy,
+			time = 1,
+			delay = CardScalToPatternParam.time})
+
+			transition.moveTo(v.innerCard, {x = v.innerCard.posPattern[1], y = v.innerCard.posPattern[2], time = CardFlipParam.Time, delay = CardScalToPatternParam.time})			
+
+			--todo:渐隐	
+			transition.fadeOut(v.innerCard, {time = 0.5, delay = CardScalToPatternParam.time})
+		end
+	end
+end
+
+function RoomMyCardUI:flyBackCardsBySeat(seat)
+	local destPosition = {}
+	if seat and 3 == seat then
+		destPosition.x = 100
+		destPosition.y = 300
+		for k, v in ipairs(self.m_lastCircleCards) do
+			transition.moveTo(v, {x = destPosition.x, y = destPosition.y, time = 1, delay=4})
+			transition.fadeOut(v, {time = 0.4, delay = 4.6})
+		end
+		local sequence = transition.sequence({
+			cc.DelayTime:create(5),
+			cc.CallFunc:create(function()
+				self.m_lastCircleCards = {}
+				self.m_lastCards = {}
+			end)
+		})
+		self:runAction(sequence)
+	elseif seat and 2 == seat then
+		destPosition.x = 400
+		destPosition.y = 600
+		for k, v in ipairs(self.m_lastCircleCards) do
+			transition.moveTo(v, {x = destPosition.x, y = destPosition.y, time = 1, delay=4})
+			transition.fadeOut(v, {time = 0.4, delay = 4.6})
+		end
+		local sequence = transition.sequence({
+			cc.DelayTime:create(5),
+			cc.CallFunc:create(function()
+				self.m_lastCircleCards = {}
+				self.m_lastCards = {}
+			end)
+		})
+		self:runAction(sequence)
+	elseif seat and 1 == seat then
+		destPosition.x = 800
+		destPosition.y = 600
+		for k, v in ipairs(self.m_lastCircleCards) do
+			transition.moveTo(v, {x = destPosition.x, y = destPosition.y, time = 1, delay=4})
+			transition.fadeOut(v, {time = 0.4, delay = 4.6})
+		end
+		local sequence = transition.sequence({
+			cc.DelayTime:create(5),
+			cc.CallFunc:create(function()
+				self.m_lastCircleCards = {}
+				self.m_lastCards = {}
+			end)
+		})
+		self:runAction(sequence)
+	elseif seat and 0 == seat then
+		destPosition.x = display.cx
+		destPosition.y = 100
+		for k, v in ipairs(self.m_lastCircleCards) do
+			transition.moveTo(v, {x = destPosition.x, y = destPosition.y, time = 1, delay=4})
+			transition.fadeOut(v, {time = 0.4, delay = 4.6})
+		end
+		local sequence = transition.sequence({
+			cc.DelayTime:create(5),
+			cc.CallFunc:create(function()
+				self:insertCardsToMine()
+				self:sortCards()
+				self:replaceCards()
+				self.m_lastCircleCards = {}
+				self.m_lastCards = {}
+			end)
+		})
+		self:runAction(sequence)
+	end
+end
+
+function RoomMyCardUI:sortCards()
+	local cards = {}
+	for k, v in pairs(self.m_cards) do
+		cards[#cards + 1] = v
+	end
+	self.m_cards = {}
+	for k, v in ipairs(cards) do
+		self.m_cards[#self.m_cards + 1] = v
+	end
+	table.sort(self.m_cards, function(a, b)
+		return a:getCardValue() > b:getCardValue()
+	end)
+end
+
+function RoomMyCardUI:insertCardsToMine()
+	for k, v in pairs(self.m_lastCircleCards) do
+		local card = require(GameRoomPath .. "card")
+			.new(v.innerCard:getCardValue(), v.innerCard:getCardType(), self)
+		self.m_cards[#self.m_cards + 1] = card
+		self:addChild(card)
 	end
 end
 

@@ -14,10 +14,10 @@ function MyApp:run()
     self:enterScene("MainScene")
 
      -- 清空输出的日志
-    local outLogFile = io.open("DebugLogFile.txt", "w")
-    local newLogTime = ToolUtil.getTimeYMD(os.time())
-    outLogFile:write("##DebufLog"..newLogTime)
-    outLogFile:close()
+    -- local outLogFile = io.open("DebugLogFile.txt", "w")
+    -- local newLogTime = ToolUtil.getTimeYMD(os.time())
+    -- outLogFile:write("##DebufLog"..newLogTime)
+    -- outLogFile:close()
 end
 
 return MyApp

@@ -92,6 +92,7 @@ end
 function SingleScene:onPlayNextEvent(event)
     if event.mid == PhpInfo:getMid() then
         self:createOutCardButton()
+        self:showFlipButton()
     end
 end
 

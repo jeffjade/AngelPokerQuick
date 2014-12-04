@@ -19,7 +19,12 @@ function RoomScene:ctor()
     -- self:showCardPattern()
     self:schedulerProcess()
     self:registerEvent()
-    self:createFollowButton()
+
+    EventDispatchController:addEventListener( "kPlayerFlipCardsEv", handler(self, self.onPlayerFlipCards))
+end
+
+function RoomScene:onPlayerFlipCards(event)
+    self:flipCardsBySeat(event.seat)
 end
 
 function RoomScene:getPlayerByMid(mid)
@@ -78,6 +83,9 @@ function RoomScene:createOutCardButton()
         self.m_btnOutCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx - 100, display.cy - 80)
         self.m_btnOutCard:onButtonClicked(function()
             self.m_btnOutCard:setVisible(false)
+            if self.m_btnFollowCard then
+                self.m_btnFollowCard:setVisible(false)
+            end
             self:showSelectDialog()
         end)
         self:addChild(self.m_btnOutCard)
@@ -89,14 +97,17 @@ function RoomScene:createOutCardButton()
     self.m_btnOutCard:setVisible(true)
 end
 
-function RoomScene:createFollowButton()
+function RoomScene:flipCardsBySeat(seat)
+    self.m_cardUi:flipLastCards(seat)
+end
+
+function RoomScene:showFlipButton()
     if not self.m_btnFollowCard then
         self.m_btnFollowCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx + 100, display.cy - 80)
         self.m_btnFollowCard:onButtonClicked(function()
-            --todo
             if self.m_cardUi then
-                self.m_cardUi:FlipLastCards()
-
+                self.m_btnFollowCard:setVisible(false)
+                self.m_btnOutCard:setVisible(false)
                 EventDispatchController:dispatchEvent( { name = "kServerTurnPlayCardsEv", 
                                                          mid = PhpInfo:getMid() } )
             end
@@ -108,6 +119,7 @@ function RoomScene:createFollowButton()
         imgBtnInnerCircle:setPosition(-32, -32)
         self.m_btnFollowCard:addChild(imgBtnInnerCircle)
     end
+    self.m_btnFollowCard:setVisible(true)
 end
 
 function RoomScene:showMyCards(tCards)
