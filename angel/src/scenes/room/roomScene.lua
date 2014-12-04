@@ -90,9 +90,9 @@ function RoomScene:createOutCardButton()
         end)
         self:addChild(self.m_btnOutCard)
 
-        local imgBtnInnerCircle = cc.ui.UIImage.new("btnOutCardInnerCircle.png")
-        imgBtnInnerCircle:setPosition(-32, -32)
-        self.m_btnOutCard:addChild(imgBtnInnerCircle)
+        local label = cc.ui.UILabel.new({UILabelType=1, text="出牌",font="font_hei.fnt"})
+        label:setPosition(-25, 0)
+        self.m_btnOutCard:addChild(label)
     end
     self.m_btnOutCard:setVisible(true)
 end
@@ -115,9 +115,9 @@ function RoomScene:showFlipButton()
         self.m_btnFollowCard:setLocalZOrder(1000)
         self:addChild(self.m_btnFollowCard)
 
-        local imgBtnInnerCircle = cc.ui.UIImage.new("btnOutCardInnerCircle.png")
-        imgBtnInnerCircle:setPosition(-32, -32)
-        self.m_btnFollowCard:addChild(imgBtnInnerCircle)
+        local label = cc.ui.UILabel.new({UILabelType=1, text="翻牌",font="font_hei.fnt"})
+        label:setPosition(-25, 0)
+        self.m_btnFollowCard:addChild(label)
     end
     self.m_btnFollowCard:setVisible(true)
 end
@@ -190,9 +190,9 @@ end
 function RoomScene:schedulerProcess()
     local scheduler = require("framework.scheduler")
 
-    local percent = 0
+    local percent = 100
     local function onInterval(dt)
-        percent = (percent + 1) % 100 + 1
+        percent = (percent + 99) % 100
 
         percent1 = (percent + 20) % 100 + 1
         self.m_widgetProgressBarFirstPerson:setPercent(percent1)
