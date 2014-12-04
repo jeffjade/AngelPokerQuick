@@ -207,7 +207,6 @@ end
 
 function SingleServer:onPlayStartEvent(event)
 	-- 发消息告诉现在进入新的一轮;
-	-- EventDispatcher.getInstance():dispatch(kServerPlayNewTurnEv);
 	self.mHadPlay = true
 
 	local function onCallThinkHowGame()
@@ -324,19 +323,10 @@ function SingleServer:onTurnCardEvent(event)
 		self.mRoomInfo:clearRecordOutCardsInfo()
 
 		self.mRoomInfo:setNextPlayer( mid )
-		-- self.mRoomInfo:updateDirection(selfPlayer)
 		self.mRoomScene:updatePlayerLastCountByMid( lastMid )
 	end
 	
-	--[[
-	local maxPlayerNum = SingleMaxPlayerNum
-	for i = 1 , maxPlayerNum do 
-		local player = self.mRoomInfo:findPlayerByDirection( i )
-		if player then
-			self.mRoomInfo:updateDirection(player)
-		end
-	end]]
-	
+	-- Tell All New Turn Start !!!
 	EventDispatchController:dispatchEvent({name = "kServerPlayNewTurnEv" })
 
 	local function onCallThinkHowGame()
@@ -355,7 +345,7 @@ function SingleServer:onPlayNextEvent(event)
 			local player = self.mRoomInfo:findPlayerByMid(mid);
 			player:thinkHowGame()
 		end
-		QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 1 )
+		QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 2.5 )
 	end
 end
 -- ---------------------------------onEventCallBack-----------------------------------------------

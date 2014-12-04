@@ -23,9 +23,10 @@ end
 
 function SingleScene:registerEvent()
     EventDispatchController:addEventListener( "kServerPlayStartEv" ,      handler(self, self.onPlayStartEvent))
-    EventDispatchController:addEventListener("kServerDealCardsEv" ,      handler(self, self.onGameDealCardsEvent))
-    EventDispatchController:addEventListener("kServerPlayNextEv" ,       handler(self, self.onPlayNextEvent))
-    EventDispatchController:addEventListener("kServerPlayerOutCardsEv" , handler(self, self.onPlayOutCardsEvent))
+    EventDispatchController:addEventListener("kServerDealCardsEv" ,       handler(self, self.onGameDealCardsEvent))
+    EventDispatchController:addEventListener("kServerPlayNextEv" ,        handler(self, self.onPlayNextEvent))
+    EventDispatchController:addEventListener("kServerPlayerOutCardsEv" ,  handler(self, self.onPlayOutCardsEvent))
+    EventDispatchController:addEventListener( "kServerPlayNewTurnEv" ,    handler(self, self.onPlayNewTurnEvent))
 end
 
 function SingleScene:getRoomInfo()
@@ -92,7 +93,9 @@ end
 function SingleScene:onPlayNextEvent(event)
     if event.mid == PhpInfo:getMid() then
         self:createOutCardButton()
-        self:showFlipButton()
+        if not self.isNewTurn then
+            self:showFlipButton()
+        end
     end
 end
 
@@ -111,6 +114,11 @@ function SingleScene:onPlayOutCardsEvent(event)
         -- 播放玩家自己出牌 之 (动画)
         self:showPlayerLeftCardCount(seat , leftCount)
     end
+    self.isNewTurn = false
+end
+
+function SingleScene:onPlayNewTurnEvent(event)
+    self.isNewTurn = true
 end
 -- ---------------------------------onEventCallBack-----------------------------------------------
 
