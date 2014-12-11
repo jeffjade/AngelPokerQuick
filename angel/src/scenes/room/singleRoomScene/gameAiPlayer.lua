@@ -38,6 +38,8 @@ function GameAiPlayer:thinkHowGame(lastMid)
 	local myCards = self:getPlayerCards().cards;
 	if lastMid == 0 or lastMid == self.mMid or self.mIsNewTurn then
 		outCards , betCards = self:outFirstCard(myCards);
+
+		self.mRoomInfo:setBetCardVaule( betCards.cardValue )
 	else
 		outCards , betCards = self:outLargeCard(myCards);
 	end
@@ -61,7 +63,9 @@ end
 function GameAiPlayer:outFirstCard(myCards)
 	local outCards , betCards
 	-- first out card: random from true(1) and false(0)
-	local betCardsFlag = ToolUtil.randomInt(1 , 1)
+	local betCardsFlag = ToolUtil.randomInt(0 , 0)
+
+	print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG = " .. betCardsFlag)
 	if betCardsFlag == 1 then
 		outCards , betCards = self:outBetTrueCard(myCards)
 	elseif betCardsFlag == 0 then 
@@ -160,8 +164,31 @@ function GameAiPlayer:findTrueCardList(Cards)
 end
 
 -- 出假牌(即out bet牌 不一致)
-function GameAiPlayer:outBetFalseCard()
+function GameAiPlayer:outBetFalseCard(myCards)
 	print("GameAiPlayer:outBetFalseCard()~~~~~~")
+	local falseCardMachine = require("logic/FalseCardMachine").new();
+
+	falseCardMachine.getInstance():setRealCards( myCards );
+	local betCardValue = self.mRoomInfo:getBetCardVaule()
+
+    --设置真牌值
+    falseCardMachine.getInstance():setRealCardsValue( betCardValue );
+    falseCardMachine.getInstance():setRandOneFalseProp(0.25,0.25,0.30,0.20);
+    falseCardMachine.getInstance():setPropForTypeOneCard(1.0);
+    falseCardMachine.getInstance():setPropForTypeTwoCard(0.5,0.5);
+    falseCardMachine.getInstance():setPropForTypeThreeCard(0.4,0.3,0.3);
+    falseCardMachine.getInstance():setPropForTypeFourCard(0.4,0.3,0.2,0.1);
+    local isBet = true;
+    local outCards , betFalseValue = falseCardMachine.getInstance():getCardsForFalseCard( isBet );
+    
+    local betCards = {}
+    betCards.num = outCards and #outCards
+    betCards.cardValue = betFalseValue
+
+    print("结果为:::::")
+    print_lua_table( outCards )
+    print("outBetFalseCard 是否是叫牌：", betFalseValue or "没有叫牌!");
+    return outCards , betCards
 end
 
 

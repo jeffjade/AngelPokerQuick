@@ -90,6 +90,15 @@ function RoomCache:getRecordOutCardsInfo()
 	return self.mAllOutCardsInfo
 end
 
+-- 设置一轮中叫牌值[第一个先叫的](cardValue)
+function RoomCache:setBetCardVaule(cardValue)
+	self.mBetCardVaule = cardValue
+end
+
+function RoomCache:getBetCardVaule()
+	return self.mBetCardVaule
+end
+
 -- [新的一轮]重置所有玩家所出的牌相关的信息;
 function RoomCache:clearRecordOutCardsInfo()
 	self:setRecordLastOutCardsInfo( self.mAllOutCardsInfo )

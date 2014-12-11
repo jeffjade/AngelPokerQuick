@@ -17,6 +17,7 @@ FalseCardMachine.instance = nil;
 
 function FalseCardMachine:ctor()
 	self.m_realCards = {}; 	  	 -- 牌数组
+	self.m_handCards = {};	--存放所有传入的手牌
 	self.m_realCardValue = nil;  -- 真牌值
 	self.m_oneFalseCards = {};   -- 1张假牌数组
 	self.m_twoFalseCards = {};   -- 2张假牌数组
@@ -59,8 +60,19 @@ end
 
 --设置牌数组
 function FalseCardMachine:setRealCards(realcards)
+	self.m_handCards = clone(realcards);
 	if realcards then 
-		self.m_realCards = clone(realcards);
+		for k,v in pairs(realcards) do
+			for k2,v2 in pairs(v) do
+				if k2 == "cardValue" then
+					if v2 > 13 then
+						v2 = v2 -13;
+					end
+					self.m_realCards[#self.m_realCards+1] = v2;
+				end
+			end
+		end
+		table.sort(self.m_realCards);
 	end
 end
 
@@ -93,33 +105,20 @@ function FalseCardMachine:step1FrEveryNumberCards(num)
 			m_oneFalseCards = ToolUtil.combination(self.m_realCards,1) or {};
 		elseif num == 2 then 
 			m_twoFalseCards = ToolUtil.combination(self.m_realCards,2) or {};
-		
 		elseif num == 3 then 
 			m_threeFalseCards = ToolUtil.combination(self.m_realCards,3) or {};
-		
 		elseif num == 4 then 
 			m_fourFalseCards = ToolUtil.combination(self.m_realCards,4) or {};
-		
 		end
 		self.m_oneFalseCards = clone(removeRetable(m_oneFalseCards));
 		self.m_twoFalseCards = clone(removeRetable(m_twoFalseCards));
 		self.m_threeFalseCards = clone(removeRetable(m_threeFalseCards));
 		self.m_fourFalseCards = clone(removeRetable(m_fourFalseCards));
-		print("step1FrEveryNumberCards")
-		print(#self.m_oneFalseCards)
-		print(#self.m_twoFalseCards)
-		print(#self.m_threeFalseCards)
-		print(#self.m_fourFalseCards);
-
-	end)
-	print(#self.m_oneFalseCards);
-	print(#self.m_twoFalseCards);
-	print(#self.m_threeFalseCards);
-	print(#self.m_fourFalseCards);
+	end);
 	coroutine.resume(tempcoroutine);
 end
 
---根据真牌，去除所有可能包含真牌的数组,生成符合条件的1张、2张、3张、4张假牌数组
+-- --根据真牌，去除所有可能包含真牌的数组,生成符合条件的1张、2张、3张、4张假牌数组
 function FalseCardMachine:step2RemoveRealCards()
 	local function removePArray(a,b)
 		local newArray = {};
@@ -148,7 +147,6 @@ function FalseCardMachine:step2RemoveRealCards()
 		self.m_twoFalseCards = clone(removePArray(self.m_twoFalseCards,m_tempSecondRealCardValue));
 		self.m_threeFalseCards = clone(removePArray(self.m_threeFalseCards,m_tempThirdRealCardValue));
 		self.m_fourFalseCards = clone(removePArray(self.m_fourFalseCards,m_tempFourthRealCardValue));
-
 	end
 end
 
@@ -162,12 +160,12 @@ function FalseCardMachine:step4GenerateSuitableArray(num)
 			local iNum = 0;
 			local lastValue;
 			for j=1,#self.m_twoFalseCards[i] do 
-				if self.m_twoFalseCards[i] == lastValue then 
+				if self.m_twoFalseCards[i][j] == lastValue then 
 					iNum = iNum + 1;
 				else
 					iNum = 1;
 				end 
-				lastValue = self.m_twoFalseCards[i];
+				lastValue = self.m_twoFalseCards[i][j];
 			end
 			if iNum == 1 then --表示AB类型
 				self.m_typeTwoCardAB[#self.m_typeTwoCardAB+1] = self.m_twoFalseCards[i];
@@ -181,20 +179,20 @@ function FalseCardMachine:step4GenerateSuitableArray(num)
 			local lastNum = 0;
 	    		local lastValue;
 	    		for j=1,#self.m_threeFalseCards[i] do
-	     			if self.m_threeFalseCards[j] == lastValue then
+	     			if self.m_threeFalseCards[i][j] == lastValue then
 	     				iNum = iNum + 1;
 	      			else
 	       				lastNum = iNum;
 	    				iNum = 1;
 	     			end
-	      			lastValue = self.m_threeFalseCards[j];
+	      			lastValue = self.m_threeFalseCards[i][j];
 	     		end
 	     		if iNum == 1 and lastNum == 1 then --表示ABC类型
 	     			self.m_typeThrCardABC[#self.m_typeThrCardABC+1] = self.m_threeFalseCards[i];
 	   		elseif iNum == 3 and lastNum == 0 then --表示AAA类型
-	      			self.m_typeThrCardABC[#self.m_typeThrCardABC+1] = self.m_threeFalseCards[i];
+	      			self.m_typeThrCardAAA[#self.m_typeThrCardAAA+1] = self.m_threeFalseCards[i];
 	   		elseif iNum == 2 and lastNum == 1 or iNum == 1 and lastNum == 2 then --表示ABB类型
-	      			self.m_typeThrCardABC[#self.m_typeThrCardABC+1] = self.m_threeFalseCards[i];
+	      			self.m_typeThrCardAAB[#self.m_typeThrCardAAB+1] = self.m_threeFalseCards[i];
 	   		end
 	   	end
 	elseif num == 4 then 
@@ -203,7 +201,7 @@ function FalseCardMachine:step4GenerateSuitableArray(num)
 			local bNum = 0;
 			local lastValue;
 			for j=1,#self.m_fourFalseCards[i] do 
-				if self.m_fourFalseCards[j] == lastValue then
+				if self.m_fourFalseCards[i][j] == lastValue then
 					aNum = aNum + 1;
 				else
 					if aNum == 2 then
@@ -213,7 +211,7 @@ function FalseCardMachine:step4GenerateSuitableArray(num)
 					end
 					aNum = 1;
 				end
-				lastValue = self.m_fourFalseCards[j];
+				lastValue = self.m_fourFalseCards[i][j];
 			end
 
 			if aNum == 1 and bNum == 0 then --表示是ABCD型
@@ -286,6 +284,7 @@ end
 --清空所有的数组列表
 function FalseCardMachine:clearAllData()
 	self.m_realCards = {}; 	  	 -- 牌数组
+	self.m_handCards = {}; --存如所有的手牌
 	self.m_realCardValue = nil;  -- 真牌值
 	self.m_oneFalseCards = {};   -- 1张假牌数组
 	self.m_twoFalseCards = {};   -- 2张假牌数组
@@ -317,119 +316,34 @@ function FalseCardMachine:getCardsForFalseCard(isJiao)
 	--@param propValues 几种概率值
 	local function randomByProp(props,propValues)
 		math.randomseed(tostring(os.time()):reverse():sub(1, 6));
-		if type(props) == "table" and type(propValues) == "table" and #props ~= #propValues then 
+		if type(props) ~= "table" or type(propValues) ~= "table" or #props ~= #propValues then
 			return;
 		end
-		if #props == 1 then 
+		if #props == 1 then
 			return propValues[1];
-		elseif #props == 2 then 
+		elseif #props >= 2 then
 			local randomProp = math.random();
-			if randomProp <= props[1] then 
-				return propValues[1];
-			else
-				return propValues[2];
+			local param = 0;
+			local index = 1;
+			for i=1,#props do
+				param = param + props[i];
+				if param > randomProp then
+					index = i;
+					break;
+				end
 			end
-		elseif #props == 3 then 
-			local randomProp = math.random();
-			if randomProp <= props[1] then 
-				return propValues[1];
-			elseif randomProp <= props[1] + props[2] then 
-				return propValues[2];
-			elseif randomProp <= props[1] + props[2] + props[3] then 
-				return propValues[3];
-			else
-				return propValues[3];
-			end
-		elseif #props == 4 then
-			local randomProp = math.random();
-			if randomProp <= props[1] then 
-				return propValues[1];
-			elseif randomProp <= props[1] + props[2] then 
-				return propValues[2];
-			elseif randomProp <= props[1] + props[2] + props[3] then 
-				return propValues[3];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] then 
-				return propValues[4];
-			else
-				return propValues[4];
-			end	
-		elseif #props == 12 then 
-			local randomProp = math.random();
-			if randomProp <= props[1] then 
-				return propValues[1];
-			elseif randomProp <= props[1] + props[2] then 
-				return propValues[2];
-			elseif randomProp <= props[1] + props[2] + props[3] then 
-				return propValues[3];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] then 
-				return propValues[4];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] then 
-				return propValues[5];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] then 
-				return propValues[6];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] then 
-				return propValues[7];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] 
-								+ props[8] then 
-				return propValues[8];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] 
-								+ props[8] + props[9] then 
-				return propValues[9];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] 
-								+ props[8] + props[9] + props[10] then 
-				return propValues[10];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] 
-								+ props[8] + props[9] + props[10] + props[11] then 
-				return propValues[11];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] 
-								+ props[8] + props[9] + props[10] + props[11] + props[12] then 
-				return propValues[12];
-			end 
-		elseif #props == 13 then 
-			local randomProp = math.random();
-			if randomProp <= props[1] then 
-				return propValues[1];
-			elseif randomProp <= props[1] + props[2] then 
-				return propValues[2];
-			elseif randomProp <= props[1] + props[2] + props[3] then 
-				return propValues[3];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] then 
-				return propValues[4];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] then 
-				return propValues[5];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] then 
-				return propValues[6];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] then 
-				return propValues[7];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] 
-								+ props[8] then 
-				return propValues[8];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] 
-								+ props[8] + props[9] then 
-				return propValues[9];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] 
-								+ props[8] + props[9] + props[10] then 
-				return propValues[10];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] 
-								+ props[8] + props[9] + props[10] + props[11] then 
-				return propValues[11];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] 
-								+ props[8] + props[9] + props[10] + props[11] + props[12] then 
-				return propValues[12];
-			elseif randomProp <= props[1] + props[2] + props[3] + props[4] + props[5] + props[6] + props[7] 
-								+ props[8] + props[9] + props[10] + props[11] + props[12] + props[13] then 
-				return propValues[13];
-			end 
+			return propValues[index];
 		end
 	end
 
+	--这个一般A都是1-13
 	local function removePArray(a,b)
 		local newArray = {};
 
 		for i=1,#a do
 			local flag = false;
 			for j=1,#b do
-				if a[i][j] == b[j] then
+				if a[i] == b[j] then
 					flag = true;
 				end
 			end
@@ -444,29 +358,72 @@ function FalseCardMachine:getCardsForFalseCard(isJiao)
 						self.m_rand_fourFalseProp};
 	local randomNums = {1,2,3,4};
 	local randomNumCount = randomByProp(randomProps,randomNums);
+
 	print("随机数字:" .. randomNumCount);
 	self:step1FrEveryNumberCards(randomNumCount);
 	self:step2RemoveRealCards();
+
 	self:step4GenerateSuitableArray(randomNumCount);
 
+	print("AA:" .. #self.m_typeTwoCardAA);
+	for i=1,#self.m_typeTwoCardAA do 
+		print(unpack(self.m_typeTwoCardAA[i]));
+	end
+	print("AB:" .. #self.m_typeTwoCardAB);
+	for i=1,#self.m_typeTwoCardAB do 
+		print(unpack(self.m_typeTwoCardAB[i]));
+	end
+	print("ABC" .. #self.m_typeThrCardABC);
+	for i=1,#self.m_typeThrCardABC do 
+		print(unpack(self.m_typeThrCardABC[i]));
+	end
+	print("AAB" .. #self.m_typeThrCardAAB);
+	for i=1,#self.m_typeThrCardAAB do 
+		print(unpack(self.m_typeThrCardAAB[i]));
+	end
+	print("AAA" .. #self.m_typeThrCardAAA);
+	for i=1,#self.m_typeThrCardAAA do 
+		print(unpack(self.m_typeThrCardAAA[i]));
+	end
+	print("ABCD" .. #self.m_typeFouCardABCD);
+	for i=1,#self.m_typeFouCardABCD do 
+		print(unpack(self.m_typeFouCardABCD[i]));
+	end
+	print("AABC" .. #self.m_typeFouCardAABC);
+	for i=1,#self.m_typeFouCardAABC do 
+		print(unpack(self.m_typeFouCardAABC[i]));
+	end
+	print("AAAB" .. #self.m_typeFouCardAAAB);
+	for i=1,#self.m_typeFouCardAAAB do 
+		print(unpack(self.m_typeFouCardAAAB[i]));
+	end
+	print("AAAA" .. #self.m_typeFouCardAAAA);
+	for i=1,#self.m_typeFouCardAAAA do 
+		print(unpack(self.m_typeFouCardAAAA[i]));
+	end
 
 	if randomNumCount == 1 then 
 		local typeRandomProps = {self.m_typeProperties[1]};
 		local typeRandomValues = {"A"};
 		local typeCard = randomByProp(typeRandomProps,typeRandomValues);
-		print("随机类型:" .. typeCard or "nil");
 		if typeCard == "A" then 
-			local paramCard = ToolUtil.combination(self.m_typeOneCardA,1);
-			print("随机牌:" .. paramCard);
+			local randomParam = {};
+			local randomParamValue = {};
+			for i=1,#self.m_typeOneCardA do 
+				randomParam[#randomParam+1] = 1/#self.m_typeOneCardA;
+				randomParamValue[#randomParamValue+1] = i;
+			end
+			local randomValue = randomByProp(randomParam,randomParamValue);
+			local paramCard = self.m_typeOneCardA[randomValue];
 			if isJiao then 
 				--这边叫牌是从A-K随机概率的(单张牌去除一张概率)
 				local param = {0.08,0.08,0.08,0.08,0.08, 0.08,0.08,0.08,0.08,0.08, 0.08,0.08};
 				local paramValueAll = {1,2,3,4,5,6,7,8,9,10,11,12,13};
-				local paramValue = removePArray(paramValueAll,{paramCard});
+				local paramValue = removePArray(paramValueAll,paramCard);
 				local xiaojiaoCard = randomByProp(param,paramValue);
-				return paramCard,xiaojiaoCard;
+				return self:returnRealCardsForType(paramCard),xiaojiaoCard;
 			end
-			return paramCard;
+			return self:returnRealCardsForType(paramCard);
 		end
 	elseif randomNumCount == 2 then 
 		local typeRandomProps = self.m_typeProperties[2];
@@ -474,28 +431,46 @@ function FalseCardMachine:getCardsForFalseCard(isJiao)
 		local typeCard = randomByProp(typeRandomProps,typeRandomValues);
 		print("随机类型:" .. typeCard);
 		if typeCard == "AB" then 
-			local paramCards = ToolUtil.combination(self.m_typeTwoCardAB,1);
-			print("随机牌:" .. paramCards);
+			if #self.m_typeTwoCardAB == 0 then 
+				return self:getCardsForFalseCard(isJiao);
+			end
+			local randomParam = {};
+			local randomParamValue = {};
+			for i=1,#self.m_typeTwoCardAB do 
+				randomParam[#randomParam+1] = 1/#self.m_typeTwoCardAB;
+				randomParamValue[#randomParamValue+1] = i;
+			end
+			local randomValue = randomByProp(randomParam,randomParamValue);
+			local paramCards = self.m_typeTwoCardAB[randomValue];
 			if isJiao then 
 				--这边叫牌是从A-K随机概率的(单张牌去除一张概率)
 				local param = {0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07};
 				local paramValueAll = {1,2,3,4,5,6,7,8,9,10,11,12,13};
 				local xiaojiaoCard = randomByProp(param,paramValueAll);
-				return paramCards,xiaojiaoCard;
+				return self:returnRealCardsForType(paramCards),xiaojiaoCard;
 			end
-			return paramCards;
+			return self:returnRealCardsForType(paramCards);
 		elseif typeCard == "AA" then 
-			local paramCards = ToolUtil.combination(self.m_typeTwoCardAA,1);
-			print("随机牌:" .. paramCards);
+			if #self.m_typeTwoCardAA == 0 then 
+				return self:getCardsForFalseCard(isJiao);
+			end
+			local randomParam = {};
+			local randomParamValue = {};
+			for i=1,#self.m_typeTwoCardAA do 
+				randomParam[#randomParam+1] = 1/#self.m_typeTwoCardAA;
+				randomParamValue[#randomParamValue+1] = i;
+			end
+			local randomValue = randomByProp(randomParam,randomParamValue);
+			local paramCards = self.m_typeTwoCardAA[randomValue];
 			if isJiao then 
 				--这边叫牌是从A-K随机概率的(单张牌去除一张概率)
 				local param = {0.08,0.08,0.08,0.08,0.08, 0.08,0.08,0.08,0.08,0.08, 0.08,0.08};
 				local paramValueAll = {1,2,3,4,5,6,7,8,9,10,11,12,13};
 				local paramValue = removePArray(paramValueAll,{paramCards[1]});
 				local xiaojiaoCard = randomByProp(param,paramValue);
-				return paramCards,xiaojiaoCard;
+				return self:returnRealCardsForType(paramCards),xiaojiaoCard;
 			end
-			return paramCards;
+			return self:returnRealCardsForType(paramCards);
 		end
 	elseif randomNumCount == 3 then 
 		local typeRandomProps = self.m_typeProperties[3];
@@ -503,96 +478,183 @@ function FalseCardMachine:getCardsForFalseCard(isJiao)
 		local typeCard = randomByProp(typeRandomProps,typeRandomValues);
 		print("随机类型:" .. typeCard);
 		if typeCard == "ABC" then 
-			local paramCards = ToolUtil.combination(self.m_typeThrCardABC,1);
-			print("随机牌:" .. paramCards);
+			if #self.m_typeThrCardABC == 0 then 
+				return self:getCardsForFalseCard(isJiao);
+			end
+			local randomParam = {};
+			local randomParamValue = {};
+			for i=1,#self.m_typeThrCardABC do 
+				randomParam[#randomParam+1] = 1/#self.m_typeThrCardABC;
+				randomParamValue[#randomParamValue+1] = i;
+			end
+			local randomValue = randomByProp(randomParam,randomParamValue);
+			local paramCards = self.m_typeThrCardABC[randomValue];
 			if isJiao then 
 				--这边叫牌是从A-K随机概率的
 				local param = {0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07};
 				local paramValueAll = {1,2,3,4,5,6,7,8,9,10,11,12,13};
 				local xiaojiaoCard = randomByProp(param,paramValueAll);
-				return paramCards,xiaojiaoCard;
+				return self:returnRealCardsForType(paramCards),xiaojiaoCard;
 			end
-			return paramCards;
+			return self:returnRealCardsForType(paramCards);
 		elseif typeCard == "AAB" then 
-			local paramCards = ToolUtil.combination(self.m_typeThrCardAAB,1);
-			print("随机牌:" .. paramCards or "nil");
+			if #self.m_typeThrCardAAB == 0 then 
+				return self:getCardsForFalseCard(isJiao);
+			end 
+			local randomParam = {};
+			local randomParamValue = {};
+			for i=1,#self.m_typeThrCardAAB do 
+				randomParam[#randomParam+1] = 1/#self.m_typeThrCardAAB;
+				randomParamValue[#randomParamValue+1] = i;
+			end
+			local randomValue = randomByProp(randomParam,randomParamValue);
+			local paramCards = self.m_typeThrCardAAB[randomValue];
 			if isJiao then 
 				--这边叫牌是从A-K随机概率的
 				local param = {0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07};
 				local paramValueAll = {1,2,3,4,5,6,7,8,9,10,11,12,13};
 				local xiaojiaoCard = randomByProp(param,paramValueAll);
-				return paramCards,xiaojiaoCard;
+				return self:returnRealCardsForType(paramCards),xiaojiaoCard;
 			end
-			return paramCards;
+			return self:returnRealCardsForType(paramCards);
 		elseif typeCard == "AAA" then 
-			local paramCards = ToolUtil.combination(self.m_typeThrCardAAA,1);
-			print("随机牌:" .. paramCards or "nil");
+			if #self.m_typeThrCardAAA == 0 then 
+				return self:getCardsForFalseCard(isJiao);
+			end 
+			local randomParam = {};
+			local randomParamValue = {};
+			for i=1,#self.m_typeThrCardAAA do 
+				randomParam[#randomParam+1] = 1/#self.m_typeThrCardAAA;
+				randomParamValue[#randomParamValue+1] = i;
+			end
+			local randomValue = randomByProp(randomParam,randomParamValue);
+			local paramCards = self.m_typeThrCardAAA[randomValue];
+			print(paramCards);
 			if isJiao then 
 				--这边叫牌是从A-K随机概率的
 				local param = {0.08,0.08,0.08,0.08,0.08, 0.08,0.08,0.08,0.08,0.08, 0.08,0.08};
 				local paramValueAll = {1,2,3,4,5,6,7,8,9,10,11,12,13};
 				local paramValue = removePArray(paramValueAll,{paramCards[1]});
 				local xiaojiaoCard = randomByProp(param,paramValue);
-				return paramCards,xiaojiaoCard;
+				return self:returnRealCardsForType(paramCards),xiaojiaoCard;
 			end
-			return paramCards;
+			return self:returnRealCardsForType(paramCards);
 		end
 	elseif randomNumCount == 4 then 
 		local typeRandomProps = self.m_typeProperties[4];
 		local typeRandomValues = {"ABCD","AABC","AAAB","AAAA"};
 		local typeCard = randomByProp(typeRandomProps,typeRandomValues);
 		print("随机类型:" .. typeCard);
-		if typeCard == "ABCD" then 
-			local paramCards = ToolUtil.combination(self.m_typeFouCardABCD,1);
-			print("随机牌:" .. paramCards);
+		if typeCard == "ABCD" then
+			if #self.m_typeFouCardABCD == 0 then 
+				return self:getCardsForFalseCard(isJiao);
+			end 
+			local randomParam = {};
+			local randomParamValue = {};
+			for i=1,#self.m_typeFouCardABCD do 
+				randomParam[#randomParam+1] = 1/#self.m_typeFouCardABCD;
+				randomParamValue[#randomParamValue+1] = i;
+			end
+			local randomValue = randomByProp(randomParam,randomParamValue);
+			local paramCards = self.m_typeFouCardABCD[randomValue];
 			if isJiao then 
 				--这边叫牌是从A-K随机概率的
 				local param = {0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07};
 				local paramValueAll = {1,2,3,4,5,6,7,8,9,10,11,12,13};
 				local xiaojiaoCard = randomByProp(param,paramValueAll);
-				return paramCards,xiaojiaoCard;
+				return self:returnRealCardsForType(paramCards),xiaojiaoCard;
 			end
-			return paramCards;
+			return self:returnRealCardsForType(paramCards);
 		elseif typeCard == "AABC" then 
-			local paramCards = ToolUtil.combination(self.m_typeFouCardAABC,1);
-			print("随机牌:" .. paramCards);
+			if #self.m_typeFouCardAABC == 0 then 
+				return self:getCardsForFalseCard(isJiao);
+			end
+			local randomParam = {};
+			local randomParamValue = {};
+			for i=1,#self.m_typeFouCardAABC do 
+				randomParam[#randomParam+1] = 1/#self.m_typeFouCardAABC;
+				randomParamValue[#randomParamValue+1] = i;
+			end
+			local randomValue = randomByProp(randomParam,randomParamValue);
+			local paramCards = self.m_typeFouCardAABC[randomValue];
 			if isJiao then 
 				--这边叫牌是从A-K随机概率的
 				local param = {0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07};
 				local paramValueAll = {1,2,3,4,5,6,7,8,9,10,11,12,13};
 				local xiaojiaoCard = randomByProp(param,paramValueAll);
-				return paramCards,xiaojiaoCard;
+				return self:returnRealCardsForType(paramCards),xiaojiaoCard;
 			end
-			return paramCards;
+			return self:returnRealCardsForType(paramCards);
 		elseif typeCard == "AAAB" then 
-			local paramCards = ToolUtil.combination(self.m_typeFouCardAAAB,1);
-			print("随机牌:" .. paramCards);
+			if #self.m_typeFouCardAAAB == 0 then 
+				return self:getCardsForFalseCard(isJiao);
+			end
+			local randomParam = {};
+			local randomParamValue = {};
+			for i=1,#self.m_typeFouCardAAAB do 
+				randomParam[#randomParam+1] = 1/#self.m_typeFouCardAAAB;
+				randomParamValue[#randomParamValue+1] = i;
+			end
+			local randomValue = randomByProp(randomParam,randomParamValue);
+			local paramCards = self.m_typeFouCardAAAB[randomValue];
 			if isJiao then 
 				--这边叫牌是从A-K随机概率的
 				local param = {0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07,0.07,0.07, 0.07,0.07,0.07};
 				local paramValueAll = {1,2,3,4,5,6,7,8,9,10,11,12,13};
 				local xiaojiaoCard = randomByProp(param,paramValueAll);
-				return paramCards,xiaojiaoCard;
+				return self:returnRealCardsForType(paramCards),xiaojiaoCard;
 			end
-			return paramCards;
+			return self:returnRealCardsForType(paramCards);
 		elseif typeCard == "AAAA" then 
-			local paramCards = ToolUtil.combination(self.m_typeFouCardAAAA,1);
-			print("随机牌:" .. paramCards);
+			if #self.m_typeFouCardAAAA == 0 then 
+				return self:getCardsForFalseCard(isJiao);
+			end
+			local randomParam = {};
+			local randomParamValue = {};
+			for i=1,#self.m_typeFouCardAAAA do 
+				randomParam[#randomParam+1] = 1/#self.m_typeFouCardAAAA;
+				randomParamValue[#randomParamValue+1] = i;
+			end
+			local randomValue = randomByProp(randomParam,randomParamValue);
+			local paramCards = self.m_typeFouCardAAAA[randomValue];
 			if isJiao then 
 				--这边叫牌是从A-K随机概率的
 				local param = {0.08,0.08,0.08,0.08,0.08, 0.08,0.08,0.08,0.08,0.08, 0.08,0.08};
 				local paramValueAll = {1,2,3,4,5,6,7,8,9,10,11,12,13};
 				local paramValue = removePArray(paramValueAll,{paramCards[1]});
 				local xiaojiaoCard = randomByProp(param,paramValue);
-				return paramCards,xiaojiaoCard;
+				return self:returnRealCardsForType(paramCards),xiaojiaoCard;
 			end
-			return paramCards;
+			return self:returnRealCardsForType(paramCards);
 		end
 	end
 
 	self:clearAllData();
+end
 
-	
+--返回选中的真实牌
+--realcards...返回卡牌的值
+--返回卡牌对应的牌
+FalseCardMachine.returnRealCardsForType = function(self,realcards)
+	if not self.m_handCards or not realcards then 
+		print("参数有误！！！！！！！！");
+		return;
+	end
+	local newArray = {};
+	for i=1,#self.m_handCards do 
+		for k=1,#realcards do 
+			if self.m_handCards[i].cardValue and self.m_handCards[i].cardValue == realcards[k] then 
+				if #newArray == #realcards then 
+					return clone(newArray);
+				end
+				realcards[k] = 0;
+				newArray[#newArray+1] = self.m_handCards[i];
+				break;
+				
+			end
+		end
+	end
+	return clone(newArray);
 end
 
 return FalseCardMachine;
