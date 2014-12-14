@@ -60,7 +60,7 @@ function SingleScene:onEnter()
 end
 
 function SingleScene:onExit()
-
+    RoomScene.onExit(self)
 end
 
 function SingleScene:onCleanup()

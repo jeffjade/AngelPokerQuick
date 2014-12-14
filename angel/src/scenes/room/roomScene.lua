@@ -70,8 +70,6 @@ end
 function RoomScene:onEnter()
 end
 
-function RoomScene:onExit() 
-end
 
 function RoomScene:showSelectDialog()
     self.m_dlgSelectCard = require(GameRoomPath .. "roomDialog/selectCardDialog").new(self.m_cardUi)
@@ -208,7 +206,16 @@ function RoomScene:schedulerProcess()
         self.m_selfLoadingBar:setPercent(percentSelf)
     end
 
-    scheduler.scheduleGlobal(onInterval, 0.05)    
+    self.m_scheduler = scheduler.scheduleGlobal(onInterval, 0.05)    
+end
+
+function RoomScene:stopScheduler()
+    local scheduler = require("framework.scheduler")
+    scheduler.unscheduleGlobal(self.m_scheduler)
+end
+
+function RoomScene:onExit()
+    self:stopScheduler()
 end
 
 return RoomScene
