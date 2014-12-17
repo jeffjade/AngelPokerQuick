@@ -28,15 +28,16 @@ function GameAiPlayer:getRoomInfo()
 	return self.mRoomInfo
 end
 
-function GameAiPlayer:thinkHowGame(lastMid)
+function GameAiPlayer:thinkHowGame( isNewTurn )
 	local lastMid = self.mRoomInfo:getLastPlayer();
 	print("~~~~~~~~GameAiPlayer mid is:"..self.mMid)
 	print("~~~~~~~~GameAiPlayer:ai out cards:lastMid = "..lastMid)
+	print("~~~~~~~~GameAiPlayer: isNewTurn = ".. (isNewTurn and "true!!!" or "false!!!") )
 	local outCards;
 	local betCards;
 
 	local myCards = self:getPlayerCards().cards;
-	if lastMid == 0 or lastMid == self.mMid then
+	if lastMid == 0 or lastMid == self.mMid or isNewTurn then
 		outCards , betCards = self:outFirstCard(myCards);
 	else
 		outCards , betCards = self:outLargeCard(myCards);
@@ -89,9 +90,12 @@ function GameAiPlayer:outLargeCard(myCards)
 		end
 	end
 
+	local betCards = {num = #tempCards , cardValue = lastCardsValue}
+
 	if next(tempCards) then
-		return tempCards , tempCards
+		return tempCards , betCards
 	else
+		print("---------------------------turn cards -------------------!!! !!!")
 		return nil , nil
 	end
 end
@@ -177,7 +181,7 @@ function GameAiPlayer:outBetFalseCard(myCards)
     falseCardMachine.getInstance():setPropForTypeTwoCard(0.5,0.5);
     falseCardMachine.getInstance():setPropForTypeThreeCard(0.4,0.3,0.3);
     falseCardMachine.getInstance():setPropForTypeFourCard(0.4,0.3,0.2,0.1);
-    local isBet = false;
+    local isBet = true;
     local outCards , betFalseValue = falseCardMachine.getInstance():getCardsForFalseCard( isBet );
     
     local betCards = {}

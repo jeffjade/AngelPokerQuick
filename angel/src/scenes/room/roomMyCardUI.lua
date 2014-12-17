@@ -88,6 +88,8 @@ function RoomMyCardUI:updateFollowCard()
 		cards[#cards + 1] = card
 	end
 	self.m_statusCards = {}
+	print("PhpInfo:gainBetCardVaule() =" .. PhpInfo:gainBetCardVaule() )
+	
 	player:setOutCards(#cards, {num = #cards, cardValue = PhpInfo:gainBetCardVaule()}, cards)
 	player:removeCard(#cards , cards)
 	EventDispatchController:dispatchEvent({name = "SINGLE_SERVER_OUT_CARDS", mid = PhpInfo:getMid()})

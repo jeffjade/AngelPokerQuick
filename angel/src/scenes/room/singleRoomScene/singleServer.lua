@@ -161,7 +161,6 @@ function SingleServer:nextPlayerPlay()
 	if player then
 		local mid = player:getMid()
 		print("SingleServer:nextPlayerPlay() mid ="..mid)
-		-- self:onPlayNextEvent(mid)
 		EventDispatchController:dispatchEvent( {name = "kServerPlayNextEv", mid = mid} )
 
 		self.mRoomInfo:setCurrentPlayer(mid)
@@ -241,9 +240,12 @@ function SingleServer:onOutCardEvent(event)
 	end
 
 	local betCards = cards.betCards
+	print("8888888888888888888888888 self.mIsNewTurn ="..(self.mIsNewTurn and  "true" or "false"))
+	print_lua_table(cards)
+	print("8888888888888888888888888 betCards.cardValue ="..(betCards.cardValue))
 	if self.mIsNewTurn then 
 		self.mRoomInfo:setBetCardVaule( betCards.cardValue )   --[[*设置每轮FirstBetCardValue*]]
-		PhpInfo.saveBetCardVaule( betCards.cardValue )         --[[*保存每轮FirstBetCardValue*]]--无奈兮;之后改！
+		PhpInfo:saveBetCardVaule( betCards.cardValue )         --[[*保存每轮FirstBetCardValue*]]--无奈兮;之后改！
 	end
 	self.mIsNewTurn = false
 
@@ -261,6 +263,8 @@ function SingleServer:onOutCardEvent(event)
 	playerOutCardsInfo.outCards = cards.outCards
 	playerOutCardsInfo.betCards = cards.betCards
 	self.mRoomInfo:setRecordOutCardsInfo(playerOutCardsInfo)
+	print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF------------")
+	print_lua_table(playerOutCardsInfo)
 
 	local gameIsOver = (player and player:getPlayerCards().count == 0) or false;
 	if gameIsOver then
@@ -327,7 +331,6 @@ function SingleServer:onTurnCardEvent(event)
 											seat = seat} )
 
 		selfPlayer:receiveAllOutCards( allPlayerOutCards )
-		self.mRoomInfo:clearRecordOutCardsInfo()
 
 		self.mRoomInfo:setNextPlayer( lastMid )
 		self.mRoomScene:updatePlayerLastCountByMid( mid )
@@ -338,11 +341,11 @@ function SingleServer:onTurnCardEvent(event)
     	EventDispatchController:dispatchEvent( {name = "kPlayerFlipCardsEv", 
 											seat = seat} )
 
-		self.mRoomInfo:clearRecordOutCardsInfo()
-
 		self.mRoomInfo:setNextPlayer( mid )
 		self.mRoomScene:updatePlayerLastCountByMid( lastMid )
 	end
+
+	self.mRoomInfo:clearRecordOutCardsInfo()
 	
 	-- Tell All New Turn Start !!!
 	EventDispatchController:dispatchEvent({name = "kServerPlayNewTurnEv" })
@@ -361,7 +364,8 @@ function SingleServer:onPlayNextEvent(event)
 		local function onCallThinkHowGame()
 			print("=============onCallThinkHowGame==============mid =" .. mid)
 			local player = self.mRoomInfo:findPlayerByMid(mid);
-			player:thinkHowGame()
+			local isNewTurn = self.mIsNewTurn and true or false
+			player:thinkHowGame( isNewTurn )
 		end
 		QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 2.5 )
 	end

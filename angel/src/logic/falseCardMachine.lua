@@ -93,7 +93,7 @@ end
 -- @param num -- 随机的是几张牌
 function FalseCardMachine:step1FrEveryNumberCards(num)
 	if not self.m_realCards or #self.m_realCards == 0 then 
-		print("no realCards")
+		-- print("no realCards")
 		return ;
 	end
 	local tempcoroutine = coroutine.create(function()
@@ -359,47 +359,47 @@ function FalseCardMachine:getCardsForFalseCard(isJiao)
 	local randomNums = {1,2,3,4};
 	local randomNumCount = randomByProp(randomProps,randomNums);
 
-	print("随机数字:" .. randomNumCount);
+	-- print("随机数字:" .. randomNumCount);
 	self:step1FrEveryNumberCards(randomNumCount);
 	self:step2RemoveRealCards();
 
 	self:step4GenerateSuitableArray(randomNumCount);
 
-	print("AA:" .. #self.m_typeTwoCardAA);
+	-- print("AA:" .. #self.m_typeTwoCardAA);
 	for i=1,#self.m_typeTwoCardAA do 
-		print(unpack(self.m_typeTwoCardAA[i]));
+		-- print(unpack(self.m_typeTwoCardAA[i]));
 	end
-	print("AB:" .. #self.m_typeTwoCardAB);
+	-- print("AB:" .. #self.m_typeTwoCardAB);
 	for i=1,#self.m_typeTwoCardAB do 
-		print(unpack(self.m_typeTwoCardAB[i]));
+		-- print(unpack(self.m_typeTwoCardAB[i]));
 	end
-	print("ABC" .. #self.m_typeThrCardABC);
+	-- print("ABC" .. #self.m_typeThrCardABC);
 	for i=1,#self.m_typeThrCardABC do 
-		print(unpack(self.m_typeThrCardABC[i]));
+		-- print(unpack(self.m_typeThrCardABC[i]));
 	end
-	print("AAB" .. #self.m_typeThrCardAAB);
+	-- print("AAB" .. #self.m_typeThrCardAAB);
 	for i=1,#self.m_typeThrCardAAB do 
-		print(unpack(self.m_typeThrCardAAB[i]));
+		-- print(unpack(self.m_typeThrCardAAB[i]));
 	end
-	print("AAA" .. #self.m_typeThrCardAAA);
+	-- print("AAA" .. #self.m_typeThrCardAAA);
 	for i=1,#self.m_typeThrCardAAA do 
-		print(unpack(self.m_typeThrCardAAA[i]));
+		-- print(unpack(self.m_typeThrCardAAA[i]));
 	end
-	print("ABCD" .. #self.m_typeFouCardABCD);
+	-- print("ABCD" .. #self.m_typeFouCardABCD);
 	for i=1,#self.m_typeFouCardABCD do 
-		print(unpack(self.m_typeFouCardABCD[i]));
+		-- print(unpack(self.m_typeFouCardABCD[i]));
 	end
-	print("AABC" .. #self.m_typeFouCardAABC);
+	-- print("AABC" .. #self.m_typeFouCardAABC);
 	for i=1,#self.m_typeFouCardAABC do 
-		print(unpack(self.m_typeFouCardAABC[i]));
+		-- print(unpack(self.m_typeFouCardAABC[i]));
 	end
-	print("AAAB" .. #self.m_typeFouCardAAAB);
+	-- print("AAAB" .. #self.m_typeFouCardAAAB);
 	for i=1,#self.m_typeFouCardAAAB do 
-		print(unpack(self.m_typeFouCardAAAB[i]));
+		-- print(unpack(self.m_typeFouCardAAAB[i]));
 	end
-	print("AAAA" .. #self.m_typeFouCardAAAA);
+	-- print("AAAA" .. #self.m_typeFouCardAAAA);
 	for i=1,#self.m_typeFouCardAAAA do 
-		print(unpack(self.m_typeFouCardAAAA[i]));
+		-- print(unpack(self.m_typeFouCardAAAA[i]));
 	end
 
 	if randomNumCount == 1 then 
@@ -429,7 +429,7 @@ function FalseCardMachine:getCardsForFalseCard(isJiao)
 		local typeRandomProps = self.m_typeProperties[2];
 		local typeRandomValues = {"AB","AA"};
 		local typeCard = randomByProp(typeRandomProps,typeRandomValues);
-		print("随机类型:" .. typeCard);
+		-- print("随机类型:" .. typeCard);
 		if typeCard == "AB" then 
 			if #self.m_typeTwoCardAB == 0 then 
 				return self:getCardsForFalseCard(isJiao);
@@ -476,7 +476,7 @@ function FalseCardMachine:getCardsForFalseCard(isJiao)
 		local typeRandomProps = self.m_typeProperties[3];
 		local typeRandomValues = {"ABC","AAB","AAA"};
 		local typeCard = randomByProp(typeRandomProps,typeRandomValues);
-		print("随机类型:" .. typeCard);
+		-- print("随机类型:" .. typeCard);
 		if typeCard == "ABC" then 
 			if #self.m_typeThrCardABC == 0 then 
 				return self:getCardsForFalseCard(isJiao);
@@ -529,7 +529,7 @@ function FalseCardMachine:getCardsForFalseCard(isJiao)
 			end
 			local randomValue = randomByProp(randomParam,randomParamValue);
 			local paramCards = self.m_typeThrCardAAA[randomValue];
-			print(paramCards);
+			-- print(paramCards);
 			if isJiao then 
 				--这边叫牌是从A-K随机概率的
 				local param = {0.08,0.08,0.08,0.08,0.08, 0.08,0.08,0.08,0.08,0.08, 0.08,0.08};
@@ -544,7 +544,7 @@ function FalseCardMachine:getCardsForFalseCard(isJiao)
 		local typeRandomProps = self.m_typeProperties[4];
 		local typeRandomValues = {"ABCD","AABC","AAAB","AAAA"};
 		local typeCard = randomByProp(typeRandomProps,typeRandomValues);
-		print("随机类型:" .. typeCard);
+		-- print("随机类型:" .. typeCard);
 		if typeCard == "ABCD" then
 			if #self.m_typeFouCardABCD == 0 then 
 				return self:getCardsForFalseCard(isJiao);
@@ -637,7 +637,7 @@ end
 --返回卡牌对应的牌
 FalseCardMachine.returnRealCardsForType = function(self,realcards)
 	if not self.m_handCards or not realcards then 
-		print("参数有误！！！！！！！！");
+		-- print("参数有误！！！！！！！！");
 		return;
 	end
 	local newArray = {};
