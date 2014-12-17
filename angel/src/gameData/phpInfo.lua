@@ -32,3 +32,12 @@ end
 function PhpInfo:getSex()
 	return PhpInfo.mSex
 end
+
+-- --[[*保存每轮FirstBetCardValue*]]
+function PhpInfo:saveBetCardVaule( cardValue )
+	PhpInfo.mBetCardVaule = cardValue
+end
+
+function PhpInfo:gainBetCardVaule()
+	return PhpInfo.mBetCardVaule
+end

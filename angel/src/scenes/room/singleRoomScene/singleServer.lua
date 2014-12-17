@@ -28,6 +28,7 @@ function SingleServer:registerEvent()
 	EventDispatchController:addEventListener( "SINGLE_SERVER_OUT_CARDS" , handler(self, self.onOutCardEvent) )
 	EventDispatchController:addEventListener( "kServerTurnPlayCardsEv" ,  handler(self, self.onTurnCardEvent) )
 	EventDispatchController:addEventListener( "kServerPlayNextEv" ,       handler(self, self.onPlayNextEvent) )
+	EventDispatchController:addEventListener( "kServerPlayNewTurnEv" ,    handler(self, self.onPlayNewTurnEvent) )
 end
 
 function SingleServer:unregisterEvent()
@@ -206,7 +207,8 @@ function SingleServer:onGameReadyEvent()
 end
 
 function SingleServer:onPlayStartEvent(event)
-	-- 发消息告诉现在进入新的一轮;
+	-- Tell All New Turn Start !!!
+	EventDispatchController:dispatchEvent({name = "kServerPlayNewTurnEv" })
 	self.mHadPlay = true
 
 	local function onCallThinkHowGame()
@@ -237,7 +239,15 @@ function SingleServer:onOutCardEvent(event)
 			lastCards[k].cardByte = v.cardByte
 		end
 	end
-	self.mRoomInfo:setLastOutCards(cards.count , cards.betCards , lastCards) --??
+
+	local betCards = cards.betCards
+	if self.mIsNewTurn then 
+		self.mRoomInfo:setBetCardVaule( betCards.cardValue )   --[[*设置每轮FirstBetCardValue*]]
+		PhpInfo.saveBetCardVaule( betCards.cardValue )         --[[*保存每轮FirstBetCardValue*]]--无奈兮;之后改！
+	end
+	self.mIsNewTurn = false
+
+	self.mRoomInfo:setLastOutCards(cards.count , betCards , lastCards) --??
 	self.mRoomInfo:setLastPlayer(mid)
 	
 	-- print("SingleServer Last Out Cards Is:")
@@ -271,7 +281,15 @@ function SingleServer:onTurnCardEvent(event)
 
 	local lastCards = self.mRoomInfo:getLastOutCards()
 	local outCards, betCards = lastCards.outCards , lastCards.betCards
+	
+	local betCardValue = self.mRoomInfo:getBetCardVaule()
+	print("betCardValue =" .. betCardValue)
+	print("betCards.cardValue =" .. betCards.cardValue)
+	if betCardValue ~= betCards.cardValue then
+		error("Outcards Is illegal For BetCardValue !^X^!")
+	end
 
+	-- Compare outCards and betCards;
 	local outIsTrue = CardUtil.judgePlayIsTrue(outCards, betCards)
 
 	local tipStr = string.format("Mid=%d玩家翻牌,结果是:%s",mid, (outIsTrue and "true" or "false") )
@@ -347,6 +365,10 @@ function SingleServer:onPlayNextEvent(event)
 		end
 		QueueMachine:getInstance():delayCommand( onCallThinkHowGame , 2.5 )
 	end
+end
+
+function SingleServer:onPlayNewTurnEvent()
+	self.mIsNewTurn = true
 end
 -- ---------------------------------onEventCallBack-----------------------------------------------
 

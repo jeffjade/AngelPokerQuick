@@ -36,10 +36,8 @@ function GameAiPlayer:thinkHowGame(lastMid)
 	local betCards;
 
 	local myCards = self:getPlayerCards().cards;
-	if lastMid == 0 or lastMid == self.mMid or self.mIsNewTurn then
+	if lastMid == 0 or lastMid == self.mMid then
 		outCards , betCards = self:outFirstCard(myCards);
-
-		self.mRoomInfo:setBetCardVaule( betCards.cardValue )
 	else
 		outCards , betCards = self:outLargeCard(myCards);
 	end
@@ -63,7 +61,7 @@ end
 function GameAiPlayer:outFirstCard(myCards)
 	local outCards , betCards
 	-- first out card: random from true(1) and false(0)
-	local betCardsFlag = ToolUtil.randomInt(0 , 0)
+	local betCardsFlag = ToolUtil.randomInt(1 , 0)
 
 	print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG = " .. betCardsFlag)
 	if betCardsFlag == 1 then
@@ -178,14 +176,15 @@ function GameAiPlayer:outBetFalseCard(myCards)
     falseCardMachine.getInstance():setPropForTypeTwoCard(0.5,0.5);
     falseCardMachine.getInstance():setPropForTypeThreeCard(0.4,0.3,0.3);
     falseCardMachine.getInstance():setPropForTypeFourCard(0.4,0.3,0.2,0.1);
-    local isBet = true;
+    local isBet = false;
     local outCards , betFalseValue = falseCardMachine.getInstance():getCardsForFalseCard( isBet );
     
     local betCards = {}
     betCards.num = outCards and #outCards
     betCards.cardValue = betFalseValue
 
-    print("结果为:::::")
+    print("outBetFalseCard 结果为:::::")
+    print("outBetFalseCard #outCards = " .. #outCards )
     print_lua_table( outCards )
     print("outBetFalseCard 是否是叫牌：", betFalseValue or "没有叫牌!");
     return outCards , betCards

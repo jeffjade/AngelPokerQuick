@@ -551,7 +551,7 @@ function print_lua_table (lua_table, indent)
     end
 
     if not next(lua_table) then
-    	print("This table is kong table")
+    	print("This table is kong table..>^<")
     end 
 
     indent = indent or 0
