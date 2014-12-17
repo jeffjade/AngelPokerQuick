@@ -10,10 +10,6 @@ SingleScene.PLAY_START = "singlePlayStartEvent"
 
 function SingleScene:ctor()
 	self.super.ctor(self)
-
-    cc.ui.UILabel.new({UILabelType = 2, text = "SINGLE GAME", size = 64 ,color = cc.c3b(22,222,22)})
-        :align(display.CENTER, display.cx, display.top-50)
-        :addTo(self)
 end
 
 function SingleScene:init()
@@ -77,14 +73,13 @@ end
 -- ---------------------------------onEventCallBack-----------------------------------------------
 function SingleScene:onPlayStartEvent(event)
     if event.mid == PhpInfo:getMid() then
-        self:createOutCardButton()
+        self:showOutCardButton()
     end
 end
 
 function SingleScene:onGameDealCardsEvent(event)
     local  mid = event.mid
 	if mid == PhpInfo:getMid() then
-		-- print_lua_table(event.playerCards)
 		self:showMyCards(event.playerCards)
 	end
     self:updatePlayerLastCountByMid(mid)
@@ -92,9 +87,11 @@ end
 
 function SingleScene:onPlayNextEvent(event)
     if event.mid == PhpInfo:getMid() then
-        self:createOutCardButton()
-        if not self.isNewTurn then
+        if self.isNewTurn then
+            self:showOutCardButton()
+        else
             self:showFlipButton()
+            self:showFollowButton()
         end
     end
 end

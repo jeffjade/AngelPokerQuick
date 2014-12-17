@@ -165,6 +165,7 @@ end
 function GameAiPlayer:outBetFalseCard(myCards)
 	print("GameAiPlayer:outBetFalseCard()~~~~~~")
 	local falseCardMachine = require("logic/FalseCardMachine").new();
+	falseCardMachine.getInstance():clearAllData();
 
 	falseCardMachine.getInstance():setRealCards( myCards );
 	local betCardValue = self.mRoomInfo:getBetCardVaule()

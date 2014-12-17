@@ -16,7 +16,6 @@ function RoomScene:ctor()
     self:addChild(self.rootScene)
     self:createSelfLoadingBar()
     self:init()
-    -- self:showCardPattern()
     self:schedulerProcess()
     self:registerEvent()
 
@@ -31,29 +30,6 @@ function RoomScene:getPlayerByMid(mid)
 end
 
 function RoomScene:init()
-
-    self:showMyCards({{cardValue=3, cardType=3}, 
-        {cardValue=4, cardType=3},
-        {cardValue=5, cardType=3},
-        {cardValue=6, cardType=3},
-        {cardValue=7, cardType=3},
-        {cardValue=8, cardType=3},
-        {cardValue=9, cardType=3},
-        {cardValue=10, cardType=3},
-        {cardValue=11, cardType=3}}
-        )
-
-    self:createOutCardButton()
-
-    self:flyOutCardsBySeat(1,
-    {{cardValue=3, cardType=3},
-    {cardValue=3, cardType=3},
-    {cardValue=3, cardType=3}})
-
-    self.m_cardUi:showCardsAmountBySeat(3, 12)
-    self.m_cardUi:showCardsAmountBySeat(2, 10)
-    self.m_cardUi:showCardsAmountBySeat(1, 13)
-    self.m_cardUi:showCardsAmountBySeat(0, 15)
 end
 
 function RoomScene:registerEvent()
@@ -76,18 +52,49 @@ function RoomScene:showSelectDialog()
     self:addChild(self.m_dlgSelectCard)
 end
 
-function RoomScene:createOutCardButton()
+function RoomScene:hideOutCardbutton()
+    if self.m_btnOutCard then
+        self.m_btnOutCard:setVisible(false)
+    end
+end
+
+function RoomScene:hideFollowButton()
+    if self.m_btnFollowCard then
+        self.m_btnFollowCard:setVisible(false)
+    end
+end
+
+function RoomScene:hideFlipButton()
+    if self.m_btnFlipCard then
+        self.m_btnFlipCard:setVisible(false)
+    end
+end
+
+function RoomScene:checkSelectedCard()
+    if 0 == #self.m_cardUi.m_statusCards then
+        return false
+    end
+    return true
+end
+
+function RoomScene:showFollowStatus()
+    --todo:
+    -- if self.m_cardUi then
+    --     if false == self:checkSelectedCard() then
+    --         return
+    --     end
+    --     self.m_cardUi:updateStatus()
+    -- end
+end
+
+function RoomScene:showOutCardButton()
     if not self.m_btnOutCard then
-        self.m_btnOutCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx - 100, display.cy - 80)
+        self.m_btnOutCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx, display.cy - 80)
         self.m_btnOutCard:onButtonClicked(function()
-            self.m_btnOutCard:setVisible(false)
-            if self.m_btnFollowCard then
-                self.m_btnFollowCard:setVisible(false)
-            end
+            self:hideOutCardbutton()
             self:showSelectDialog()
         end)
         self:addChild(self.m_btnOutCard)
-
         local label = cc.ui.UILabel.new({UILabelType=1, text="出牌",font="font_hei.fnt"})
         label:setPosition(-25, 0)
         self.m_btnOutCard:addChild(label)
@@ -95,29 +102,54 @@ function RoomScene:createOutCardButton()
     self.m_btnOutCard:setVisible(true)
 end
 
-function RoomScene:flipCardsBySeat(seat)
-    self.m_cardUi:flipLastCards(seat)
-end
-
-function RoomScene:showFlipButton()
+function RoomScene:showFollowButton()
     if not self.m_btnFollowCard then
-        self.m_btnFollowCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx + 100, display.cy - 80)
+        self.m_btnFollowCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx - 100, display.cy - 80)
         self.m_btnFollowCard:onButtonClicked(function()
             if self.m_cardUi then
-                self.m_btnFollowCard:setVisible(false)
-                self.m_btnOutCard:setVisible(false)
-                EventDispatchController:dispatchEvent( { name = "kServerTurnPlayCardsEv", 
-                                                         mid = PhpInfo:getMid() } )
+                if false == self:checkSelectedCard() then
+                    return
+                end
+                self.m_cardUi:updateStatus()
+                self.m_cardUi:updateFollowCard()
             end
-        end)
-        self.m_btnFollowCard:setLocalZOrder(1000)
-        self:addChild(self.m_btnFollowCard)
 
-        local label = cc.ui.UILabel.new({UILabelType=1, text="翻牌",font="font_hei.fnt"})
+            self:hideFlipButton()
+            self:hideFollowButton()
+            --todo:跟牌
+            self:showFollowStatus()
+        end)
+        self:addChild(self.m_btnFollowCard)
+        local label = cc.ui.UILabel.new({UILabelType=2, text="跟牌"})
         label:setPosition(-25, 0)
         self.m_btnFollowCard:addChild(label)
     end
     self.m_btnFollowCard:setVisible(true)
+end
+
+function RoomScene:showFlipButton()
+    if not self.m_btnFlipCard then
+        self.m_btnFlipCard = cc.ui.UIPushButton.new("btnOutCard.png"):pos(display.cx + 100, display.cy - 80)
+        self.m_btnFlipCard:onButtonClicked(function()
+            if self.m_cardUi then
+                self:hideFlipButton()
+                self:hideFollowButton()
+                EventDispatchController:dispatchEvent( { name = "kServerTurnPlayCardsEv", 
+                                                         mid = PhpInfo:getMid() } )
+            end
+        end)
+        self.m_btnFlipCard:setLocalZOrder(1000)
+        self:addChild(self.m_btnFlipCard)
+
+        local label = cc.ui.UILabel.new({UILabelType=1, text="翻牌",font="font_hei.fnt"})
+        label:setPosition(-25, 0)
+        self.m_btnFlipCard:addChild(label)
+    end
+    self.m_btnFlipCard:setVisible(true)
+end
+
+function RoomScene:flipCardsBySeat(seat)
+    self.m_cardUi:flipLastCards(seat)
 end
 
 function RoomScene:showMyCards(tCards)
@@ -173,11 +205,6 @@ function RoomScene:createSelfLoadingBar()
     self.m_selfLoadingBar:setPosition(200, 240)
     self.m_selfLoadingBar:setPercent(90)
     self:addChild(self.m_selfLoadingBar)
-end
-
-function RoomScene:showCardPattern()
-    self.m_cardPattern = require(GameRoomPath .. "roomDialog/cardPattern").new()
-    self:addChild(self.m_cardPattern)
 end
 
 function RoomScene:showCardCall()

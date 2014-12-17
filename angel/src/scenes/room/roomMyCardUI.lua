@@ -72,7 +72,24 @@ function RoomMyCardUI:onPlayerSelectCardEvent(event)
 	self.m_statusCards = {}
 	player:setOutCards(#cards, {num = #cards, cardValue = event.cardValue}, cards)
 	player:removeCard(#cards , cards)
-	-- print_lua_table( cards )
+	EventDispatchController:dispatchEvent({name = "SINGLE_SERVER_OUT_CARDS", mid = PhpInfo:getMid()})
+	EventDispatchController:dispatchEvent({name = "kServerPlayerOutCardsEv" , mid = PhpInfo:getMid() ,outCards = cards})
+end
+
+function RoomMyCardUI:updateFollowCard()
+	local player = self.m_scene:getPlayerByMid(PhpInfo:getMid())
+	local cards = {}
+
+	for k, v in pairs(self.m_statusCards) do
+		local card = {}
+		card.cardValue = v.m_cardValue
+		card.cardType = v.m_cardType
+		card.cardByte = CardUtil.getCardByteByValueType(card.cardValue , card.cardType)
+		cards[#cards + 1] = card
+	end
+	self.m_statusCards = {}
+	player:setOutCards(#cards, {num = #cards, cardValue = PhpInfo:gainBetCardVaule()}, cards)
+	player:removeCard(#cards , cards)
 	EventDispatchController:dispatchEvent({name = "SINGLE_SERVER_OUT_CARDS", mid = PhpInfo:getMid()})
 	EventDispatchController:dispatchEvent({name = "kServerPlayerOutCardsEv" , mid = PhpInfo:getMid() ,outCards = cards})
 end
