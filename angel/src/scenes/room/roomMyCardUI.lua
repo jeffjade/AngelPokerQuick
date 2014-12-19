@@ -10,7 +10,7 @@ local RoomMyCardUIParams =
 {
 	Gap = 43,                  		
 	Width = 100,            
-	Height = 100/0.693 ,    
+	Height = 100/0.670 ,    
 	ScaleFactor = 0.25,             
 	TimeFlyOut = 1,
 }

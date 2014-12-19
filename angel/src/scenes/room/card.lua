@@ -80,25 +80,25 @@ end
 
 function Card:createCardF()
 	display.addSpriteFrames("card_f.plist", "card_f.png")
-	strNamePic = "f" .. self.m_cardValue .. ".png"
+	strNamePic = "f" .. self.m_cardValue .. ".jpg"
 	self:set(strNamePic)
 end
 
 function Card:createCardM()
 	display.addSpriteFrames("card_m.plist", "card_m.png")
-	strNamePic = "m" .. self.m_cardValue .. ".png"  
+	strNamePic = "m" .. self.m_cardValue .. ".jpg"  
 	self:set(strNamePic)
 end
 
 function Card:createCardH()
 	display.addSpriteFrames("card_h.plist", "card_h.png")
-	strNamePic = "h" .. self.m_cardValue .. ".png"
+	strNamePic = "h" .. self.m_cardValue .. ".jpg"
 	self:set(strNamePic)
 end
 
 function Card:createCardR()
 	display.addSpriteFrames("card_r.plist", "card_r.png")
-	strNamePic = "r" .. self.m_cardValue .. ".png"
+	strNamePic = "r" .. self.m_cardValue .. ".jpg"
 	self:set(strNamePic)
 end
 
