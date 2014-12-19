@@ -640,10 +640,18 @@ FalseCardMachine.returnRealCardsForType = function(self,realcards)
 		-- print("参数有误！！！！！！！！");
 		return;
 	end
+	--print("returnRealCardsForType++++++++++++");
+
 	local newArray = {};
 	for i=1,#self.m_handCards do 
-		for k=1,#realcards do 
-			if self.m_handCards[i].cardValue and self.m_handCards[i].cardValue == realcards[k] then 
+		for k=1,#realcards do
+			local tempReal = realcards[k];
+			if realcards[k] <= 1 then 
+				tempReal = tempReal + 13;
+			end
+			--print(self.m_handCards[i].cardValue)
+
+			if self.m_handCards[i].cardValue and self.m_handCards[i].cardValue == tempReal then 
 				if #newArray == #realcards then 
 					return clone(newArray);
 				end
