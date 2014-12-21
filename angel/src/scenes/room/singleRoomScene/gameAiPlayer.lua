@@ -168,7 +168,7 @@ end
 -- 出假牌(即out bet牌 不一致)
 function GameAiPlayer:outBetFalseCard(myCards)
 	print("GameAiPlayer:outBetFalseCard()~~~~~~")
-	local falseCardMachine = require("logic/FalseCardMachine").new();
+	local falseCardMachine = require("logic/falseCardMachine").new();
 	falseCardMachine.getInstance():clearAllData();
 
 	falseCardMachine.getInstance():setRealCards( myCards );

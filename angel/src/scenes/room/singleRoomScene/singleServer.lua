@@ -5,9 +5,9 @@
 local singleRobot = require("scenes/room/singleRoomScene/singleRobot")
 SingleServer = class("SingleServer")
 
-local GameAiPlayer = import(GameRoomPath..".singleRoomScene.GameAiPlayer")
+local GameAiPlayer = import(GameRoomPath.."singleRoomScene/gameAiPlayer")
 
-require(GameRoomPath.."/singleRoomScene/gameAiPlayer")
+require(GameRoomPath.."singleRoomScene/gameAiPlayer")
 
 local SingleMaxPlayerNum = 4
 
