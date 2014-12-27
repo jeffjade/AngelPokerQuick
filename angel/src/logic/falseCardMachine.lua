@@ -632,37 +632,6 @@ function FalseCardMachine:getCardsForFalseCard(isJiao)
 	self:clearAllData();
 end
 
---返回选中的真实牌
---realcards...返回卡牌的值
---返回卡牌对应的牌
-FalseCardMachine.returnRealCardsForType = function(self,realcards)
-	if not self.m_handCards or not realcards then 
-		-- print("参数有误！！！！！！！！");
-		return;
-	end
-	--print("returnRealCardsForType++++++++++++");
-
-	local newArray = {};
-	for i=1,#self.m_handCards do 
-		for k=1,#realcards do
-			local tempReal = realcards[k];
-			if realcards[k] <= 1 then 
-				tempReal = tempReal + 13;
-			end
-			--print(self.m_handCards[i].cardValue)
-
-			if self.m_handCards[i].cardValue and self.m_handCards[i].cardValue == tempReal then 
-				if #newArray == #realcards then 
-					return clone(newArray);
-				end
-				realcards[k] = 0;
-				newArray[#newArray+1] = self.m_handCards[i];
-				break;
-				
-			end
-		end
-	end
-	return clone(newArray);
-end
+s
 
 return FalseCardMachine;
